@@ -1,0 +1,5 @@
+enum Users {
+  STUDENT,
+  FACULTY,
+  ADMINISTRATOR,
+}
