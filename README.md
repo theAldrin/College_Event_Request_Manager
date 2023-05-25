@@ -1,16 +1,17 @@
-# event_consent2
+An App for Managing the entire process of acquiring consent for an event that is to be conducted in a college Environment.
 
-A new Flutter project.
+!!! ONLY FRONT END IS DEVELOPED UNTIL NOW !!!
 
-## Getting Started
+Figma Link :- https://www.figma.com/file/CVG9SyWymsjST2zEsZz84u/VERSION1?node-id=0%3A1&t=2VPw9r8xzTRObk1G-1
 
-This project is a starting point for a Flutter application.
+Software Requirement Specification Document Link :- https://docs.google.com/document/d/1wkYNghhhoEK66YcoEZoDxqH-GYJjvX1v/edit?usp=sharing&ouid=105161675278846570505&rtpof=true&sd=true
 
-A few resources to get you started if this is your first Flutter project:
+The app will have 3 types of users and they will have the following functions:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1>STUDENTS -Register -Login -Create New Event Request -View Status of All Event Requests -View Event Calendar -View Hall Allotment Details
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2>FACULTIES -Register -Login -View Pending Requests -Accept/Reject Pending Requests -Forward Pending Requests -Create New Event Request -View Status of All Event Requests -View Event Calendar -View Hall Allotment Details
+
+3>ADMINISTRATOR -Register -Login -Faculty Authorization -Hall Allotment Control -View and Edit Event Calendar -View all Event Requests and their status
+
+NO BUILD FILE
