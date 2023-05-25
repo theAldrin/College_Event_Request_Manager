@@ -133,6 +133,9 @@ class _Administrator_registrationState
   }
 
   //String? _selectedOption = 'STUDENT';
+
+  late String email, password, cnfPassword;
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -160,12 +163,83 @@ class _Administrator_registrationState
                   _entryField('College'),
                   SizedBox(height: 10),
                   _entryField('Phone No'),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'E-mail',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            onChanged: (value) {
+                              email = value;
+                            },
+                            obscureText: false,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 10),
-                  _entryField('Email'),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Password',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            onChanged: (value) {
+                              password = value;
+                            },
+                            obscureText: true,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 10),
-                  _entryField('Password', isPassword: true),
-                  SizedBox(height: 10),
-                  _entryField('Conform Password', isPassword: true),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Conform Password',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            onChanged: (value) {
+                              cnfPassword = value;
+                            },
+                            obscureText: true,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 20),
                   _submitButton(context),
                   SizedBox(height: 30),
