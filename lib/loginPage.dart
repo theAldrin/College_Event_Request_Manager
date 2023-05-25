@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'common_register.dart';
 import 'components/bezierContainer.dart';
@@ -22,6 +21,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _auth = FirebaseAuth.instance;
+  late String email, password;
+
   Widget _backButton() {
     return InkWell(
       onTap: () {
@@ -43,50 +45,84 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _entryField(String title, {bool isPassword = false}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true))
-        ],
-      ),
-    );
-  }
-
   Widget _submitButton() {
     return TextButton(
-      onPressed: () {
-        if (_selectedOption == 'STUDENT') {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Student_home()),
-          );
-        } else if (_selectedOption == 'FACULTY') {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Facluty_home()),
-          );
-        } else if (_selectedOption == 'ADMINISTRATOR') {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Administrator_home()),
+      onPressed: () async {
+        try {
+          final user = await _auth.signInWithEmailAndPassword(
+              email: email, password: password);
+          if (user != null) {
+            if (_selectedOption == 'STUDENT') {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Student_home()),
+              );
+            } else if (_selectedOption == 'FACULTY') {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Facluty_home()),
+              );
+            } else if (_selectedOption == 'ADMINISTRATOR') {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Administrator_home()),
+              );
+            }
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Expanded(
+                  child: AlertDialog(
+                    title: Text('Invalid Email and Password'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            'OK',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        } catch (e) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Expanded(
+                child: AlertDialog(
+                  title: Text(e.toString()),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'OK',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           );
         }
       },
@@ -114,87 +150,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  // Widget _divider() {
-  //   return Container(
-  //     margin: EdgeInsets.symmetric(vertical: 10),
-  //     child: Row(
-  //       children: <Widget>[
-  //         SizedBox(
-  //           width: 20,
-  //         ),
-  //         Expanded(
-  //           child: Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: 10),
-  //             child: Divider(
-  //               thickness: 1,
-  //             ),
-  //           ),
-  //         ),
-  //         Text('or'),
-  //         Expanded(
-  //           child: Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: 10),
-  //             child: Divider(
-  //               thickness: 1,
-  //             ),
-  //           ),
-  //         ),
-  //         SizedBox(
-  //           width: 20,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // Widget _facebookButton() {
-  //   return Container(
-  //     height: 50,
-  //     margin: EdgeInsets.symmetric(vertical: 20),
-  //     decoration: BoxDecoration(
-  //       borderRadius: BorderRadius.all(Radius.circular(10)),
-  //     ),
-  //     child: Row(
-  //       children: <Widget>[
-  //         Expanded(
-  //           flex: 1,
-  //           child: Container(
-  //             decoration: BoxDecoration(
-  //               color: Color(0xff1959a9),
-  //               borderRadius: BorderRadius.only(
-  //                   bottomLeft: Radius.circular(5),
-  //                   topLeft: Radius.circular(5)),
-  //             ),
-  //             alignment: Alignment.center,
-  //             child: Text('f',
-  //                 style: TextStyle(
-  //                     color: Colors.white,
-  //                     fontSize: 25,
-  //                     fontWeight: FontWeight.w400)),
-  //           ),
-  //         ),
-  //         Expanded(
-  //           flex: 5,
-  //           child: Container(
-  //             decoration: BoxDecoration(
-  //               color: Color(0xff2872ba),
-  //               borderRadius: BorderRadius.only(
-  //                   bottomRight: Radius.circular(5),
-  //                   topRight: Radius.circular(5)),
-  //             ),
-  //             alignment: Alignment.center,
-  //             child: Text('Log in with Facebook',
-  //                 style: TextStyle(
-  //                     color: Colors.white,
-  //                     fontSize: 18,
-  //                     fontWeight: FontWeight.w400)),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _createAccountLabel() {
     return InkWell(
@@ -242,15 +197,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _emailPasswordWidget() {
-    return Column(
-      children: <Widget>[
-        _entryField("Email id"),
-        _entryField("Password", isPassword: true),
-      ],
-    );
-  }
-
   String? _selectedOption = 'STUDENT';
 
   @override
@@ -275,7 +221,57 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: height * .2),
                   _title(),
                   SizedBox(height: 50),
-                  _emailPasswordWidget(),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Email id',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            keyboardType: TextInputType.emailAddress,
+                            onChanged: (value) {
+                              email = value;
+                            },
+                            obscureText: false,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Password',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            onChanged: (value) {
+                              password = value;
+                            },
+                            obscureText: true,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 10),
                   Text(
                     'Login As',

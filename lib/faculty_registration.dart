@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'components/bezierContainer.dart';
 import 'loginPage.dart';
@@ -69,41 +70,131 @@ class _Faculty_registrationState extends State<Faculty_registration> {
     );
   }
 
+  dynamic newUser;
   Widget _submitButton(BuildContext context) {
     return TextButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Expanded(
-              child: AlertDialog(
-                title: Text('Registration Succesfull'),
-                content: Text('Go to login page'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => WelcomePage()));
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        'OK',
-                        style: TextStyle(color: Colors.white),
+      onPressed: () async {
+        if (password != cnfPassword) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Expanded(
+                child: AlertDialog(
+                  title: Text('Both Passwords are not same !!!'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'OK',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        color: Colors.black,
                       ),
-                      color: Colors.black,
                     ),
+                  ],
+                ),
+              );
+            },
+          );
+        } else if (!email.contains('@tkmce.ac.in')) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Expanded(
+                child: AlertDialog(
+                  title: Text('E-mail is not from TKMCE domain'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'OK',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        } else {
+          try {
+            newUser = await _auth.createUserWithEmailAndPassword(
+                email: email, password: password);
+          } catch (e) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Expanded(
+                  child: AlertDialog(
+                    title: Text(e.toString()),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            'OK',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             );
-          },
-        );
+          }
+          if (newUser != null) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Expanded(
+                  child: AlertDialog(
+                    title: Text('Registration Succesfull'),
+                    content: Text('Go to login page'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WelcomePage()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()));
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            'OK',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        }
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -133,7 +224,7 @@ class _Faculty_registrationState extends State<Faculty_registration> {
   //String? _selectedOption = 'STUDENT';
 
   late String email, password, cnfPassword;
-
+  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
