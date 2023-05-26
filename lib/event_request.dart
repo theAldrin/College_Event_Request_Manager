@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_bdaya/flutter_datetime_picker_bdaya.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event_request extends StatefulWidget {
   const Event_request({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class Event_request extends StatefulWidget {
 class _Event_requestState extends State<Event_request> {
   final _auth = FirebaseAuth.instance;
   dynamic loggedInUser;
+  final _firestore = FirebaseFirestore.instance;
 
   void getCurrentUser() async {
     try {
@@ -29,30 +31,6 @@ class _Event_requestState extends State<Event_request> {
   void initState() {
     super.initState();
     getCurrentUser();
-  }
-
-  Widget _entryField(String title, {bool isPassword = false}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true))
-        ],
-      ),
-    );
   }
 
   Widget _title() {
@@ -77,7 +55,7 @@ class _Event_requestState extends State<Event_request> {
 
   late DateTime date;
   String formattedDate = '', formattedStartTime = '', formattedEndTime = '';
-  late String eventName, hallRoom, description, faculty;
+  late String eventName, venue, description, faculty;
 
   @override
   Widget build(BuildContext context) {
@@ -271,7 +249,7 @@ class _Event_requestState extends State<Event_request> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Hall/Room',
+                          'Venue',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15),
                         ),
@@ -280,7 +258,7 @@ class _Event_requestState extends State<Event_request> {
                         ),
                         TextField(
                             onChanged: (value) {
-                              hallRoom = value;
+                              venue = value;
                             },
                             decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -430,7 +408,18 @@ class _Event_requestState extends State<Event_request> {
                       ),
                       Expanded(
                         child: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            _firestore.collection('Event Request').add({
+                              'ID': 1,
+                              'Event Name': eventName,
+                              'Date': formattedDate,
+                              'Event Start Time': formattedStartTime,
+                              'Event End Time': formattedEndTime,
+                              'Venue': venue,
+                              'Event Description': description,
+                              'FacultIies Involved': [faculty],
+                              'Generated User': loggedInUser.email,
+                            });
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
