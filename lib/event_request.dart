@@ -409,7 +409,7 @@ class _Event_requestState extends State<Event_request> {
                       Expanded(
                         child: TextButton(
                           onPressed: () async {
-                            _firestore.collection('Event Request').add({
+                            await _firestore.collection('Event Request').add({
                               'ID': 1,
                               'Event Name': eventName,
                               'Date': formattedDate,

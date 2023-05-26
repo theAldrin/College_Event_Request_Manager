@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'student_profile_edit.dart';
 
@@ -8,7 +10,48 @@ class Student_Profile extends StatefulWidget {
   State<Student_Profile> createState() => _Student_ProfileState();
 }
 
+final _firestore = FirebaseFirestore.instance;
+dynamic loggedInUser;
+
 class _Student_ProfileState extends State<Student_Profile> {
+  final _auth = FirebaseAuth.instance;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getData() async {
+    await for (var snapshot
+        in _firestore.collection('Student User Details').snapshots()) {
+      for (var user in snapshot.docs) {
+        if (loggedInUser.email == user.data()['Email']) {
+          name = user.data()['Name'];
+          college = user.data()['College'];
+          email = user.data()['Email'];
+          department = user.data()['Department'];
+          clas = user.data()['Class'];
+          year = user.data()['Year'];
+          clubs = user.data()['Clubs'];
+          phoneno = user.data()['Phone No'];
+        }
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getData();
+  }
+
   Widget _submitButton() {
     return GestureDetector(
       onTap: () {
@@ -41,6 +84,15 @@ class _Student_ProfileState extends State<Student_Profile> {
     );
   }
 
+  String name = '',
+      college = '',
+      email = '',
+      department = '',
+      clas = '',
+      year = '',
+      clubs = '',
+      phoneno = '';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -59,7 +111,7 @@ class _Student_ProfileState extends State<Student_Profile> {
                 backgroundImage: AssetImage('images/ereh.png'),
               ),
               Text(
-                'Eren Yeagar',
+                name,
                 style: TextStyle(
                   //fontFamily: 'Pacifico',
                   fontSize: 40.0,
@@ -86,27 +138,31 @@ class _Student_ProfileState extends State<Student_Profile> {
               ),
               ProfileDetailsCard(
                 icon: Icons.school,
-                text: 'TKM COLLEGE OF ENGINEERING',
+                text: college,
               ),
               ProfileDetailsCard(
                 icon: Icons.class_,
-                text: 'CSE',
+                text: department,
+              ),
+              ProfileDetailsCard(
+                icon: Icons.calendar_month,
+                text: year,
               ),
               ProfileDetailsCard(
                 icon: Icons.holiday_village,
-                text: 'R6B',
+                text: clas,
               ),
               ProfileDetailsCard(
                 icon: Icons.party_mode,
-                text: 'IEEE, IEDC',
+                text: clubs,
               ),
               ProfileDetailsCard(
                 icon: Icons.phone,
-                text: '1313131313',
+                text: phoneno,
               ),
               ProfileDetailsCard(
                 icon: Icons.email,
-                text: 'orenonawaeren@gmail.com',
+                text: email,
               ),
               SizedBox(
                 height: 20,
@@ -122,8 +178,8 @@ class _Student_ProfileState extends State<Student_Profile> {
 
 class ProfileDetailsCard extends StatelessWidget {
   ProfileDetailsCard({required this.icon, required this.text});
-  String text;
-  IconData icon;
+  final String text;
+  final IconData icon;
   @override
   Widget build(BuildContext context) {
     return Card(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'student_event_details.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Event_history extends StatefulWidget {
   const Event_history({Key? key}) : super(key: key);
@@ -8,7 +10,29 @@ class Event_history extends StatefulWidget {
   State<Event_history> createState() => _Event_historyState();
 }
 
+final _firestore = FirebaseFirestore.instance;
+dynamic loggedInUser;
+
 class _Event_historyState extends State<Event_history> {
+  final _auth = FirebaseAuth.instance;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
   Widget _title() {
     return RichText(
       textAlign: TextAlign.left,
@@ -29,94 +53,94 @@ class _Event_historyState extends State<Event_history> {
       home: Scaffold(
         backgroundColor: Color(0x0ff3892b),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
-                  child: _title(),
-                  width: double.infinity,
-                ),
-                DropdownButton<String>(
-                  //isExpanded: true,
-                  iconEnabledColor: Color(0xfff7892b),
-                  iconSize: 60,
-                  value: _selectedOption,
-                  items: <String>[
-                    'ALL',
-                    'ADMIN ACCEPTED',
-                    'ONGOING',
-                    'REJECTED',
-                    'FINAL ACCEPT RECEIVED',
-                    'COMPLETED'
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    // Change function parameter to nullable string
-                    setState(() {
-                      _selectedOption = newValue;
-                    });
-                  },
-                ),
-                EventCard(
-                    eventTitle: 'Flutter Workshop',
-                    eventId: '101',
-                    date: '01 NOV 23',
-                    student: 'Akash',
-                    eventstatus: 'ADMIN ACCEPTED',
-                    nextpage: Student_event_details(),
-                    context: context),
-                EventCard(
-                    eventTitle: 'Soft Skill ',
-                    eventId: '200',
-                    date: '24 SEP 23',
-                    student: 'Manu',
-                    eventstatus: 'ONGOING',
-                    nextpage: Student_event_details(),
-                    context: context),
-                EventCard(
-                    eventTitle: 'Django Workshop ',
-                    eventId: '201',
-                    date: '24 DEC 23',
-                    student: 'Thara',
-                    eventstatus: 'REJECTED',
-                    nextpage: Student_event_details(),
-                    context: context),
-                EventCard(
-                    eventTitle: 'Literary Fezt',
-                    eventId: '211',
-                    date: '24 MAR 23',
-                    student: 'Akshay',
-                    eventstatus: 'FINAL ACCEPT RECEIVED',
-                    nextpage: Student_event_details(),
-                    context: context),
-                EventCard(
-                    eventTitle: 'Movie Fezt ',
-                    eventId: '300',
-                    date: '01 JAN 23',
-                    student: 'KS',
-                    eventstatus: 'COMPLETED',
-                    nextpage: Student_event_details(),
-                    context: context),
-                EventCard(
-                    eventTitle: 'Soft Skill ',
-                    eventId: '200',
-                    date: '24 SEP 23',
-                    student: 'Manu',
-                    eventstatus: 'ONGOING',
-                    nextpage: Student_event_details(),
-                    context: context)
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                child: _title(),
+                width: double.infinity,
+              ),
+              DropdownButton<String>(
+                //isExpanded: true,
+                iconEnabledColor: Color(0xfff7892b),
+                iconSize: 60,
+                value: _selectedOption,
+                items: <String>[
+                  'ALL',
+                  'ADMIN ACCEPTED',
+                  'ONGOING',
+                  'REJECTED',
+                  'FINAL ACCEPT RECEIVED',
+                  'COMPLETED'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  // Change function parameter to nullable string
+                  setState(() {
+                    _selectedOption = newValue;
+                  });
+                },
+              ),
+              //
+              MessageStream()
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+class MessageStream extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: _firestore.collection('Event Request').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          }
+          final events = snapshot.data?.docs.reversed;
+          List<EventCard> EventRequests = [];
+          for (var event in events!) {
+            // final messageText = message.data()['text'];
+            // final messageSender = message.data()['sender'];
+            if (loggedInUser.email == event.data()['Generated User']) {
+              final eventCard = EventCard(
+                  eventTitle: event.data()['Event Name'],
+                  eventId: event.data()['ID'].toString(),
+                  date: event.data()['Date'],
+                  student: event.data()['Generated User'],
+                  eventstatus: 'ONGOING',
+                  nextpage: Student_event_details(
+                      id: event.data()['ID'].toString(),
+                      date: event.data()['Date'],
+                      student: event.data()['Generated User'],
+                      eventStartTime: event.data()['Event Start Time'],
+                      eventEndTime: event.data()['Event End Time'],
+                      venue: event.data()['Venue'],
+                      description: event.data()['Event Description'],
+                      facultiesInvolved: event.data()['FacultIies Involved']),
+                  context: context);
+              EventRequests.add(eventCard);
+            }
+          }
+          return Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10),
+              children: EventRequests,
+            ),
+          );
+        });
   }
 }
 
@@ -129,12 +153,12 @@ class EventCard extends StatelessWidget {
       required this.eventstatus,
       required this.nextpage,
       required BuildContext context});
-  String eventTitle;
-  String eventId;
-  String date;
-  String student;
-  String eventstatus;
-  Widget nextpage;
+  final String eventTitle;
+  final String eventId;
+  final String date;
+  final String student;
+  final String eventstatus;
+  final Widget nextpage;
 
   Color calStatusColour(String eventstatus) {
     if (eventstatus == 'ADMIN ACCEPTED') {

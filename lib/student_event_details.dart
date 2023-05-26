@@ -2,7 +2,17 @@ import 'package:flutter/material.dart';
 import 'faculty_profile.dart';
 
 class Student_event_details extends StatefulWidget {
-  const Student_event_details({Key? key}) : super(key: key);
+  Student_event_details(
+      {required this.id,
+      required this.date,
+      required this.student,
+      required this.eventStartTime,
+      required this.eventEndTime,
+      required this.venue,
+      required this.description,
+      required this.facultiesInvolved});
+  String id, date, student, eventStartTime, eventEndTime, venue, description;
+  List<dynamic> facultiesInvolved;
 
   @override
   State<Student_event_details> createState() => _Student_event_detailsState();
@@ -37,20 +47,14 @@ class _Student_event_detailsState extends State<Student_event_details> {
                   width: double.infinity,
                 ),
                 Event_Detail_Column(
-                  id: '101',
-                  date: '01 NOV 23',
-                  student: 'Akash',
-                  event_start_time: '10 am',
-                  event_end_time: '4 pm',
-                  venue: 'M 101',
-                  description:
-                      'For giving the students an hands on training on how to develop Flutter Apps.Conducted By : Abhiram (CEO of Edtech)',
-                  faculties_involved: [
-                    'Aslah Koyathangal',
-                    'Roshan Parambiladan',
-                    'Rohit Manoj Kumar',
-                    'Adarsh M S'
-                  ],
+                  id: widget.id,
+                  date: widget.date,
+                  student: widget.student,
+                  event_start_time: widget.eventStartTime,
+                  event_end_time: widget.eventEndTime,
+                  venue: widget.venue,
+                  description: widget.description,
+                  faculties_involved: widget.facultiesInvolved,
                   isCompleted: false,
                 )
               ]),
@@ -80,7 +84,7 @@ class Event_Detail_Column extends StatelessWidget {
       venue,
       description;
 
-  final List<String> faculties_involved;
+  final List<dynamic> faculties_involved;
   final bool isCompleted;
 
   Widget _submitButton(BuildContext context) {
@@ -185,8 +189,8 @@ class Event_Detail_Column extends StatelessWidget {
   List<Widget> facultylist(BuildContext context) {
     List<Widget> FacultiesInvolvedList = [];
 
-    for (String faculty in faculties_involved) {
-      if (faculties_involved.last != faculty) {
+    for (dynamic faculty in faculties_involved) {
+      if (faculties_involved.last.toString() != faculty.toString()) {
         FacultiesInvolvedList.add(TextButton(
           onPressed: () {
             Navigator.push(
@@ -196,7 +200,7 @@ class Event_Detail_Column extends StatelessWidget {
                 ));
           },
           child: Text(
-            faculty,
+            faculty.toString(),
             style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 20,
