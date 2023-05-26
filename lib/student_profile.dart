@@ -32,14 +32,24 @@ class _Student_ProfileState extends State<Student_Profile> {
         in _firestore.collection('Student User Details').snapshots()) {
       for (var user in snapshot.docs) {
         if (loggedInUser.email == user.data()['Email']) {
-          name = user.data()['Name'];
-          college = user.data()['College'];
-          email = user.data()['Email'];
-          department = user.data()['Department'];
-          clas = user.data()['Class'];
-          year = user.data()['Year'];
-          clubs = user.data()['Clubs'];
-          phoneno = user.data()['Phone No'];
+          setState(() {
+            name = user.data()['Name'];
+            college = user.data()['College'];
+            email = user.data()['Email'];
+            department = user.data()['Department'];
+            clas = user.data()['Class'];
+            year = user.data()['Year'];
+            clubs = user.data()['Clubs'];
+            phoneno = user.data()['Phone No'];
+            name = user.data()['Name'];
+            college = user.data()['College'];
+            email = user.data()['Email'];
+            department = user.data()['Department'];
+            clas = user.data()['Class'];
+            year = user.data()['Year'];
+            clubs = user.data()['Clubs'];
+            phoneno = user.data()['Phone No'];
+          });
         }
       }
     }

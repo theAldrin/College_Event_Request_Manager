@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'components/bezierContainer.dart';
@@ -14,6 +15,8 @@ class Administrator_registration extends StatefulWidget {
 
 class _Administrator_registrationState
     extends State<Administrator_registration> {
+  final _firestore = FirebaseFirestore.instance;
+
   Widget _backButton() {
     return InkWell(
       onTap: () {
@@ -31,30 +34,6 @@ class _Administrator_registrationState
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500))
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _entryField(String title, {bool isPassword = false}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
-                  filled: true))
-        ],
       ),
     );
   }
@@ -160,6 +139,12 @@ class _Administrator_registrationState
             );
           }
           if (newUser != null) {
+            await _firestore.collection('Administrator User Details').add({
+              'Name': name,
+              'Email': email,
+              'College': 'TKM COLLEGE OF ENGINEERING',
+              'Phone No': phoneno,
+            });
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -225,7 +210,7 @@ class _Administrator_registrationState
 
   //String? _selectedOption = 'STUDENT';
 
-  late String email, password, cnfPassword;
+  late String email, password, cnfPassword, name, phoneno;
   final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
@@ -249,11 +234,55 @@ class _Administrator_registrationState
                   SizedBox(height: height * .2),
                   _title(),
                   SizedBox(height: 50),
-                  _entryField('Name'),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Name',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            onChanged: (value) {
+                              name = value;
+                            },
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 10),
-                  _entryField('College'),
-                  SizedBox(height: 10),
-                  _entryField('Phone No'),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Phone No',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextField(
+                            onChanged: (value) {
+                              phoneno = value;
+                            },
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Color(0xfff3f3f4),
+                                filled: true))
+                      ],
+                    ),
+                  ),
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
                     child: Column(

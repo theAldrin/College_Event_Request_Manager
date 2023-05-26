@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/administrator_profile_edit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Administrator_profile extends StatefulWidget {
@@ -8,7 +10,46 @@ class Administrator_profile extends StatefulWidget {
   State<Administrator_profile> createState() => _Administrator_profileState();
 }
 
+final _firestore = FirebaseFirestore.instance;
+dynamic loggedInUser;
+
 class _Administrator_profileState extends State<Administrator_profile> {
+  final _auth = FirebaseAuth.instance;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getData() async {
+    await for (var snapshot
+        in _firestore.collection('Administrator User Details').snapshots()) {
+      for (var user in snapshot.docs) {
+        if (loggedInUser.email == user.data()['Email']) {
+          setState(() {
+            name = user.data()['Name'];
+            college = user.data()['College'];
+            email = user.data()['Email'];
+            phoneno = user.data()['Phone No'];
+          });
+        }
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getData();
+  }
+
   Widget _submitButton() {
     return GestureDetector(
       onTap: () {
@@ -41,6 +82,8 @@ class _Administrator_profileState extends State<Administrator_profile> {
     );
   }
 
+  String name = '', college = '', email = '', phoneno = '';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -59,7 +102,7 @@ class _Administrator_profileState extends State<Administrator_profile> {
                 backgroundImage: AssetImage('images/ereh.png'),
               ),
               Text(
-                'Eren Yeagar',
+                name,
                 style: TextStyle(
                   //fontFamily: 'Pacifico',
                   fontSize: 40.0,
@@ -86,15 +129,15 @@ class _Administrator_profileState extends State<Administrator_profile> {
               ),
               ProfileDetailsCard(
                 icon: Icons.school,
-                text: 'TKM COLLEGE OF ENGINEERING',
+                text: college,
               ),
               ProfileDetailsCard(
                 icon: Icons.phone,
-                text: '1313131313',
+                text: phoneno,
               ),
               ProfileDetailsCard(
                 icon: Icons.email,
-                text: 'orenonawaeren@gmail.com',
+                text: email,
               ),
               SizedBox(
                 height: 50,
@@ -110,8 +153,8 @@ class _Administrator_profileState extends State<Administrator_profile> {
 
 class ProfileDetailsCard extends StatelessWidget {
   ProfileDetailsCard({required this.icon, required this.text});
-  String text;
-  IconData icon;
+  final String text;
+  final IconData icon;
   @override
   Widget build(BuildContext context) {
     return Card(

@@ -1,3 +1,6 @@
+//TODO: Needs updation to show error messages when typing wrong emails
+//snapshot alland vere nthenkilum upayogiknm or 1st userine login then check in snapshots and push new page
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'common_register.dart';
@@ -5,6 +8,7 @@ import 'components/bezierContainer.dart';
 import 'student_home.dart';
 import 'faculty_home.dart';
 import 'administrator_home.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'student_registration.dart';
 //import 'components/constants.dart';
 
@@ -19,6 +23,8 @@ class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
+
+final _firestore = FirebaseFirestore.instance;
 
 class _LoginPageState extends State<LoginPage> {
   final _auth = FirebaseAuth.instance;
@@ -45,66 +51,241 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  int flag = 0;
+
+  //Login logic if student -> take all docu from student user details, Compare with the user typed email,
+  // If found -> Login the user else not
+  //Same for faculty and admin
+  //
   Widget _submitButton() {
     return TextButton(
       onPressed: () async {
-        try {
-          final user = await _auth.signInWithEmailAndPassword(
-              email: email, password: password);
-          if (user != null) {
-            if (_selectedOption == 'STUDENT') {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Student_home()),
-              );
-            } else if (_selectedOption == 'FACULTY') {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Facluty_home()),
-              );
-            } else if (_selectedOption == 'ADMINISTRATOR') {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Administrator_home()),
-              );
-            }
-          } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Expanded(
-                  child: AlertDialog(
-                    title: Text('Invalid Email and Password'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            'OK',
-                            style: TextStyle(color: Colors.white),
+        if (_selectedOption == 'STUDENT') {
+          await for (var snapshot
+              in _firestore.collection('Student User Details').snapshots()) {
+            for (var user in snapshot.docs) {
+              if (email == user.data()['Email']) {
+                flag = 1;
+                try {
+                  final user = await _auth.signInWithEmailAndPassword(
+                      email: email, password: password);
+                  if (user != null) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => Student_home()),
+                    );
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Invalid Email and Password'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
                           ),
-                          color: Colors.black,
+                        );
+                      },
+                    );
+                  }
+                } catch (e) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Expanded(
+                        child: AlertDialog(
+                          title: Text(e.toString()),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
+                      );
+                    },
+                  );
+                }
+              }
+            }
           }
-        } catch (e) {
+        } else if (_selectedOption == 'FACULTY') {
+          await for (var snapshot
+              in _firestore.collection('Faculty User Details').snapshots()) {
+            for (var user in snapshot.docs) {
+              if (email == user.data()['Email']) {
+                flag = 1;
+                try {
+                  final user = await _auth.signInWithEmailAndPassword(
+                      email: email, password: password);
+                  if (user != null) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => Facluty_home()),
+                    );
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Invalid Email and Password'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                } catch (e) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Expanded(
+                        child: AlertDialog(
+                          title: Text(e.toString()),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              }
+            }
+          }
+        } else if (_selectedOption == 'ADMINISTRATOR') {
+          await for (var snapshot in _firestore
+              .collection('Administrator User Details')
+              .snapshots()) {
+            for (var user in snapshot.docs) {
+              if (email == user.data()['Email']) {
+                flag = 1;
+                try {
+                  final user = await _auth.signInWithEmailAndPassword(
+                      email: email, password: password);
+                  if (user != null) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Administrator_home()),
+                    );
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Invalid Email and Password'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                } catch (e) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Expanded(
+                        child: AlertDialog(
+                          title: Text(e.toString()),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              }
+            }
+          }
+        }
+        if (flag == 0) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return Expanded(
                 child: AlertDialog(
-                  title: Text(e.toString()),
+                  title: Text('Please check the entered details'),
                   actions: [
                     TextButton(
                       onPressed: () {
