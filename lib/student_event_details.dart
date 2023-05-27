@@ -3,7 +3,8 @@ import 'faculty_profile.dart';
 
 class Student_event_details extends StatefulWidget {
   Student_event_details(
-      {required this.id,
+      {required this.name,
+      required this.id,
       required this.date,
       required this.student,
       required this.eventStartTime,
@@ -11,7 +12,14 @@ class Student_event_details extends StatefulWidget {
       required this.venue,
       required this.description,
       required this.facultiesInvolved});
-  String id, date, student, eventStartTime, eventEndTime, venue, description;
+  String id,
+      date,
+      student,
+      eventStartTime,
+      eventEndTime,
+      venue,
+      description,
+      name;
   List<dynamic> facultiesInvolved;
 
   @override
@@ -23,7 +31,7 @@ class _Student_event_detailsState extends State<Student_event_details> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: 'Flutter Workshop',
+        text: widget.name,
         style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w700,

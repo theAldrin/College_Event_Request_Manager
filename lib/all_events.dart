@@ -101,6 +101,7 @@ class MessageStream extends StatelessWidget {
                 eventstatus: 'ONGOING',
                 nextpage: Student_event_details(
                     //TODO: CUSTOM ADMIN EVENT DETAIL PAGE WITH VARIOUS FUNCTIONALITIES
+                  name: event.data()['Event Name'],
                     id: event.data()['ID'].toString(),
                     date: event.data()['Date'],
                     student: event.data()['Generated User'],

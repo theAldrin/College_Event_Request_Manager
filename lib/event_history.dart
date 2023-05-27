@@ -122,6 +122,7 @@ class MessageStream extends StatelessWidget {
                   student: event.data()['Generated User'],
                   eventstatus: 'ONGOING',
                   nextpage: Student_event_details(
+                    name: event.data()['Event Name'],
                       id: event.data()['ID'].toString(),
                       date: event.data()['Date'],
                       student: event.data()['Generated User'],
