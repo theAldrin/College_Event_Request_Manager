@@ -409,8 +409,17 @@ class _Event_requestState extends State<Event_request> {
                       Expanded(
                         child: TextButton(
                           onPressed: () async {
+                            final constantDB =
+                                await _firestore.collection('Constants').get();
+                            final constant = constantDB.docs[0];
+                            int id = constant.data()['Event ID'];
+                            ++id;
+                            await _firestore
+                                .collection('Constants')
+                                .doc('gaLPmBXkrPt1m6I31CjJ')
+                                .update({'Event ID': id});
                             await _firestore.collection('Event Request').add({
-                              'ID': 1,
+                              'ID': id,
                               'Event Name': eventName,
                               'Date': formattedDate,
                               'Event Start Time': formattedStartTime,
@@ -419,6 +428,8 @@ class _Event_requestState extends State<Event_request> {
                               'Event Description': description,
                               'FacultIies Involved': [faculty],
                               'Generated User': loggedInUser.email,
+                              'Status': 'ONGOING',
+                              'TimeStamp': FieldValue.serverTimestamp()
                             });
                             showDialog(
                               context: context,

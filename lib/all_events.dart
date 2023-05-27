@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'student_event_details.dart';
 
@@ -7,6 +8,9 @@ class All_events extends StatefulWidget {
   @override
   State<All_events> createState() => _All_eventsState();
 }
+
+final _firestore = FirebaseFirestore.instance;
+dynamic loggedInUser;
 
 class _All_eventsState extends State<All_events> {
   Widget _title() {
@@ -29,70 +33,92 @@ class _All_eventsState extends State<All_events> {
       home: Scaffold(
         backgroundColor: Color(0x0ff3892b),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
-                  child: _title(),
-                  width: double.infinity,
-                ),
-                DropdownButton<String>(
-                  //isExpanded: true,
-                  iconEnabledColor: Color(0xfff7892b),
-                  iconSize: 60,
-                  value: _selectedOption,
-                  items: <String>[
-                    'ALL',
-                    'ADMIN ACCEPTED',
-                    'ONGOING',
-                    'REJECTED',
-                    'FINAL ACCEPT RECEIVED',
-                    'COMPLETED'
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    // Change function parameter to nullable string
-                    setState(() {
-                      _selectedOption = newValue;
-                    });
-                  },
-                ),
-                EventCard(
-                  eventTitle: 'Flutter Workshop',
-                  eventId: '101',
-                  date: '01 NOV 23',
-                  student: 'Akash',
-                  eventstatus: 'ADMIN ACCEPTED',
-                  nextpage: Text('d'),
-                ),
-                EventCard(
-                  eventTitle: 'Soft Skill ',
-                  eventId: '200',
-                  date: '24 SEP 23',
-                  student: 'Manu',
-                  eventstatus: 'ONGOING',
-                  nextpage: Text('d'),
-                ),
-                EventCard(
-                  eventTitle: 'Django Workshop ',
-                  eventId: '201',
-                  date: '24 DEC 23',
-                  student: 'Thara',
-                  eventstatus: 'REJECTED',
-                  nextpage: Text('d'),
-                ),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                child: _title(),
+                width: double.infinity,
+              ),
+              DropdownButton<String>(
+                //isExpanded: true,
+                iconEnabledColor: Color(0xfff7892b),
+                iconSize: 60,
+                value: _selectedOption,
+                items: <String>[
+                  'ALL',
+                  'ADMIN ACCEPTED',
+                  'ONGOING',
+                  'REJECTED',
+                  'FINAL ACCEPT RECEIVED',
+                  'COMPLETED'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  // Change function parameter to nullable string
+                  setState(() {
+                    _selectedOption = newValue;
+                  });
+                },
+              ),
+              MessageStream()
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+class MessageStream extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: _firestore.collection('Event Request').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          }
+          final events = snapshot.data?.docs.reversed;
+          List<EventCard> EventRequests = [];
+          for (var event in events!) {
+            // final messageText = message.data()['text'];
+            // final messageSender = message.data()['sender'];
+            final eventCard = EventCard(
+                eventTitle: event.data()['Event Name'],
+                eventId: event.data()['ID'].toString(),
+                date: event.data()['Date'],
+                student: event.data()['Generated User'],
+                eventstatus: 'ONGOING',
+                nextpage: Student_event_details(
+                    //TODO: CUSTOM ADMIN EVENT DETAIL PAGE WITH VARIOUS FUNCTIONALITIES
+                    id: event.data()['ID'].toString(),
+                    date: event.data()['Date'],
+                    student: event.data()['Generated User'],
+                    eventStartTime: event.data()['Event Start Time'],
+                    eventEndTime: event.data()['Event End Time'],
+                    venue: event.data()['Venue'],
+                    description: event.data()['Event Description'],
+                    facultiesInvolved: event.data()['FacultIies Involved']),
+                context: context);
+            EventRequests.add(eventCard);
+          }
+          return Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10),
+              children: EventRequests,
+            ),
+          );
+        });
   }
 }
 
@@ -103,13 +129,14 @@ class EventCard extends StatelessWidget {
       required this.date,
       required this.student,
       required this.eventstatus,
-      required this.nextpage});
-  String eventTitle;
-  String eventId;
-  String date;
-  String student;
-  String eventstatus;
-  Widget nextpage;
+      required this.nextpage,
+      required BuildContext context});
+  final String eventTitle;
+  final String eventId;
+  final String date;
+  final String student;
+  final String eventstatus;
+  final Widget nextpage;
 
   Color calStatusColour(String eventstatus) {
     if (eventstatus == 'ADMIN ACCEPTED') {
@@ -129,11 +156,9 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => nextpage,
-            ));
+        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+          builder: (context) => nextpage,
+        ));
       },
       child: Card(
         margin: EdgeInsets.fromLTRB(10, 0, 10, 10),

@@ -97,7 +97,7 @@ class _Faculty_profileState extends State<Faculty_profile> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        //backgroundColor: Color(0xfff3892b),
+        backgroundColor: Color(0xffffffff),
         body: SafeArea(
             child: SingleChildScrollView(
           child: Column(

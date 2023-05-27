@@ -71,7 +71,7 @@ class _Event_historyState extends State<Event_history> {
                   'ADMIN ACCEPTED',
                   'ONGOING',
                   'REJECTED',
-                  'FINAL ACCEPT RECEIVED',
+                  'FINAL FACULTY ACCEPTED',
                   'COMPLETED'
                 ].map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
