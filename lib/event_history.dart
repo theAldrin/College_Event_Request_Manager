@@ -123,14 +123,16 @@ class MessageStream extends StatelessWidget {
                   eventstatus: 'ONGOING',
                   nextpage: Student_event_details(
                     name: event.data()['Event Name'],
-                      id: event.data()['ID'].toString(),
-                      date: event.data()['Date'],
-                      student: event.data()['Generated User'],
-                      eventStartTime: event.data()['Event Start Time'],
-                      eventEndTime: event.data()['Event End Time'],
-                      venue: event.data()['Venue'],
-                      description: event.data()['Event Description'],
-                      facultiesInvolved: event.data()['FacultIies Involved']),
+                    id: event.data()['ID'].toString(),
+                    date: event.data()['Date'],
+                    student: event.data()['Generated User'],
+                    eventStartTime: event.data()['Event Start Time'],
+                    eventEndTime: event.data()['Event End Time'],
+                    venue: event.data()['Venue'],
+                    description: event.data()['Event Description'],
+                    facultiesInvolved: event.data()['FacultIies Involved'],
+                    status: event.data()['Status'],
+                  ),
                   context: context);
               EventRequests.add(eventCard);
             }

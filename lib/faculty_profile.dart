@@ -4,34 +4,21 @@ import 'package:flutter/material.dart';
 import 'faculty_profile_edit.dart';
 
 class Faculty_profile extends StatefulWidget {
-  const Faculty_profile({Key? key}) : super(key: key);
+  Faculty_profile({required this.facultyMail});
+  final String facultyMail;
 
   @override
   State<Faculty_profile> createState() => _Faculty_profileState();
 }
 
 final _firestore = FirebaseFirestore.instance;
-dynamic loggedInUser;
 
 class _Faculty_profileState extends State<Faculty_profile> {
-  final _auth = FirebaseAuth.instance;
-
-  void getCurrentUser() async {
-    try {
-      final user = await _auth.currentUser;
-      if (user != null) {
-        loggedInUser = user;
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   void getData() async {
     await for (var snapshot
         in _firestore.collection('Faculty User Details').snapshots()) {
       for (var user in snapshot.docs) {
-        if (loggedInUser.email == user.data()['Email']) {
+        if (widget.facultyMail == user.data()['Email']) {
           setState(() {
             name = user.data()['Name'];
             college = user.data()['College'];
@@ -49,7 +36,6 @@ class _Faculty_profileState extends State<Faculty_profile> {
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
     getData();
   }
 

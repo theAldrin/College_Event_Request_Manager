@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'faculty_profile.dart';
 
@@ -11,7 +12,8 @@ class Student_event_details extends StatefulWidget {
       required this.eventEndTime,
       required this.venue,
       required this.description,
-      required this.facultiesInvolved});
+      required this.facultiesInvolved,
+      required this.status});
   String id,
       date,
       student,
@@ -19,12 +21,15 @@ class Student_event_details extends StatefulWidget {
       eventEndTime,
       venue,
       description,
-      name;
+      name,
+      status;
   List<dynamic> facultiesInvolved;
 
   @override
   State<Student_event_details> createState() => _Student_event_detailsState();
 }
+
+final _firestore = FirebaseFirestore.instance;
 
 class _Student_event_detailsState extends State<Student_event_details> {
   Widget _title() {
@@ -63,7 +68,10 @@ class _Student_event_detailsState extends State<Student_event_details> {
                   venue: widget.venue,
                   description: widget.description,
                   faculties_involved: widget.facultiesInvolved,
-                  isCompleted: false,
+                  isCompleted: (widget.status == 'ADMIN ACCEPTED' ||
+                          widget.status == 'COMPLETED')
+                      ? true
+                      : false,
                 )
               ]),
         ),
@@ -97,7 +105,14 @@ class Event_Detail_Column extends StatelessWidget {
 
   Widget _submitButton(BuildContext context) {
     return TextButton(
-      onPressed: () {
+      onPressed: () async {
+        final eventData = await _firestore.collection('Event Request').get();
+        final events = eventData.docs;
+        for (var event in events) {
+          if (event.data()['ID'].toString() == id) {
+            await _firestore.collection('Event Request').doc(event.id).delete();
+          }
+        }
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -108,6 +123,7 @@ class Event_Detail_Column extends StatelessWidget {
                 actions: [
                   TextButton(
                     onPressed: () {
+                      Navigator.pop(context);
                       Navigator.pop(context);
                     },
                     child: Container(
@@ -172,7 +188,9 @@ class Event_Detail_Column extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Faculty_profile(),
+                  builder: (context) => Faculty_profile(
+                    facultyMail: faculties_involved.last.toString(),
+                  ),
                 ));
           },
           child: Text(
@@ -204,7 +222,9 @@ class Event_Detail_Column extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Faculty_profile(),
+                  builder: (context) => Faculty_profile(
+                    facultyMail: faculty.toString(),
+                  ),
                 ));
           },
           child: Text(

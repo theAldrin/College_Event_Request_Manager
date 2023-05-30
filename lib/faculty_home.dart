@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'calendar.dart';
 import 'faculty_profile.dart';
@@ -13,6 +14,29 @@ class Facluty_home extends StatefulWidget {
 }
 
 class _Facluty_homeState extends State<Facluty_home> {
+  final _auth = FirebaseAuth.instance;
+  dynamic loggedInUser;
+  late String currentUserEmail;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUserEmail = user.email!;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
   final _pageViewController = PageController();
 
   int _activePage = 0;
@@ -25,11 +49,14 @@ class _Facluty_homeState extends State<Facluty_home> {
 
   @override
   Widget build(BuildContext context) {
+    print(currentUserEmail);
     return Scaffold(
       body: PageView(
         controller: _pageViewController,
         children: <Widget>[
-          Faculty_profile(),
+          Faculty_profile(
+            facultyMail: 'xyz',
+          ),
           Event_history(),
           Event_request(),
           Pending_events(),

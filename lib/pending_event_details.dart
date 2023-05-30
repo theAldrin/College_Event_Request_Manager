@@ -1,14 +1,81 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'faculty_profile.dart';
 
 class Pending_Event_Details extends StatefulWidget {
-  const Pending_Event_Details({Key? key}) : super(key: key);
-
+  Pending_Event_Details({required this.eventDocumentID});
+  String eventDocumentID;
   @override
   State<Pending_Event_Details> createState() => _Pending_Event_DetailsState();
 }
 
+final _firestore = FirebaseFirestore.instance;
+dynamic loggedInUser;
+
 class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
+  late List<String> facultyMails;
+  final _auth = FirebaseAuth.instance;
+
+  late String id,
+      date,
+      student,
+      eventStartTime,
+      eventEndTime,
+      venue,
+      description,
+      name,
+      status;
+  late List<dynamic> facultiesInvolved;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getData() async {
+    var event = await _firestore
+        .collection("Event Request")
+        .doc(widget.eventDocumentID)
+        .get();
+    name = event.data()?['Event Name'];
+    id = event.data()!['ID'].toString();
+    date = event.data()?['Date'];
+    student = event.data()?['Generated User'];
+    eventStartTime = event.data()?['Event Start Time'];
+    eventEndTime = event.data()?['Event End Time'];
+    venue = event.data()?['Venue'];
+    description = event.data()?['Event Description'];
+    facultiesInvolved = event.data()?['FacultIies Involved'];
+    status = event.data()?['Status'];
+  }
+
+  void getallFaculties() async {
+    final facultyData =
+        await _firestore.collection('Faculty User Details').get();
+    final faculties = facultyData.docs;
+    for (var faculty in faculties) {
+      if (faculty.data()['Email'] != loggedInUser.email) {
+        facultyMails.add(faculty.data()['Email']);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCurrentUser();
+    getallFaculties();
+    getData();
+  }
+
   Widget _title() {
     return RichText(
       textAlign: TextAlign.center,
@@ -22,7 +89,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
     );
   }
 
-  String? _selectedOption = 'Rohit Manoj Kumar';
+  String? _selectedOption;
 
   @override
   Widget build(BuildContext context) {
@@ -31,298 +98,295 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
         backgroundColor: Color(0xFFF8F4F2),
         body: SafeArea(
           child: SingleChildScrollView(
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: <
-                    Widget>[
-              Container(
-                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
-                child: _title(),
-                width: double.infinity,
-              ),
-              Event_Detail_Column(
-                id: '101',
-                date: '01 NOV 23',
-                student: 'Akash',
-                event_start_time: '10 am',
-                event_end_time: '4 pm',
-                venue: 'M 101',
-                description:
-                    'For giving the students an hands on training on how to develop Flutter Apps.Conducted By : Abhiram (CEO of Edtech)',
-                faculties_involved: [
-                  'Aslah Koyathangal',
-                  'Roshan Parambiladan',
-                  'Rohit Manoj Kumar',
-                  'Adarsh M S'
-                ],
-                isCompleted: true,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  color: Color(0xfff7892b),
-                  child: InkWell(
-                    onTap: () {
-                      // Action to perform when the button is pressed
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Expanded(
-                            child: AlertDialog(
-                              title: Text('Date Time and Venue verified'),
-                              // content: Text('GeeksforGeeks'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Text(
-                                      'OK',
-                                      style: TextStyle(color: Colors.white),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                    child: _title(),
+                    width: double.infinity,
+                  ),
+                  Event_Detail_Column(
+                    id: id,
+                    date: date,
+                    student: student,
+                    event_start_time: eventStartTime,
+                    event_end_time: eventEndTime,
+                    venue: venue,
+                    description: description,
+                    faculties_involved: facultiesInvolved,
+                    isCompleted:
+                        (status == 'ADMIN ACCEPTED' || status == 'COMPLETED')
+                            ? true
+                            : false,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Card(
+                      color: Color(0xfff7892b),
+                      child: InkWell(
+                        onTap: () {
+                          // Action to perform when the button is pressed
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Expanded(
+                                child: AlertDialog(
+                                  title: Text('Date Time and Venue verified'),
+                                  // content: Text('GeeksforGeeks'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: Text(
+                                          'OK',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                    color: Colors.black,
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'VERIFY',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            'VERIFY',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Text(
-                'Forward To',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              DropdownButton<String>(
-                isExpanded: true,
-                iconEnabledColor: Color(0xfff7892b),
-                iconSize: 60,
-                value: _selectedOption,
-                items: <String>[
-                  'Aslah Koyathangal',
-                  'Roshan Parambiladan',
-                  'Rohit Manoj Kumar',
-                  'Adarsh Avoli'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  // Change function parameter to nullable string
-                  setState(() {
-                    _selectedOption = newValue;
-                  });
-                },
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  color: Color(0xfff7892b),
-                  child: InkWell(
-                    onTap: () {
-                      // Action to perform when the button is pressed
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Expanded(
-                            child: AlertDialog(
-                              title: Text('Event request forwarded'),
-                              // content: Text('GeeksforGeeks'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Text(
-                                      'OK',
-                                      style: TextStyle(color: Colors.white),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Text(
+                    'Forward To',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    iconEnabledColor: Color(0xfff7892b),
+                    iconSize: 60,
+                    value: _selectedOption,
+                    items: facultyMails
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      // Change function parameter to nullable string
+                      setState(() {
+                        _selectedOption = newValue;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Card(
+                      color: Color(0xfff7892b),
+                      child: InkWell(
+                        onTap: () {
+                          // Action to perform when the button is pressed
+
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Expanded(
+                                child: AlertDialog(
+                                  title: Text('Event request forwarded'),
+                                  // content: Text('GeeksforGeeks'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: Text(
+                                          'OK',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                    color: Colors.black,
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'FORWARD',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            'FORWARD',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Text(
-                'OR',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  color: Color(0xfff7892b),
-                  child: InkWell(
-                    onTap: () {
-                      // Action to perform when the button is pressed
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Expanded(
-                            child: AlertDialog(
-                              title: Text('ATTENTION !!!'),
-                              content: Text(
-                                  'Are you sure you have the authority to give final accept this event request'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Expanded(
-                                          child: AlertDialog(
-                                            title: Text(
-                                                'Do you want to give final accept to this event Request'),
-                                            //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Expanded(
-                                                        child: AlertDialog(
-                                                          title: Text(
-                                                              'Final accept for the event is provided'),
-                                                          //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Container(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    'OR',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Card(
+                      color: Color(0xfff7892b),
+                      child: InkWell(
+                        onTap: () {
+                          // Action to perform when the button is pressed
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Expanded(
+                                child: AlertDialog(
+                                  title: Text('ATTENTION !!!'),
+                                  content: Text(
+                                      'Are you sure you have the authority to give final accept this event request'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return Expanded(
+                                              child: AlertDialog(
+                                                title: Text(
+                                                    'Do you want to give final accept to this event Request'),
+                                                //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Expanded(
+                                                            child: AlertDialog(
+                                                              title: Text(
+                                                                  'Final accept for the event is provided'),
+                                                              //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    padding:
+                                                                        EdgeInsets.all(
                                                                             10),
-                                                                child: Text(
-                                                                  'OK',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white),
+                                                                    child: Text(
+                                                                      'OK',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
                                                                 ),
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
+                                                              ],
                                                             ),
-                                                          ],
-                                                        ),
+                                                          );
+                                                        },
                                                       );
                                                     },
-                                                  );
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.all(10),
-                                                  child: Text(
-                                                    'YES',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(10),
+                                                      child: Text(
+                                                        'YES',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      color: Colors.black,
+                                                    ),
                                                   ),
-                                                  color: Colors.black,
-                                                ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
+                                            );
+                                          },
                                         );
                                       },
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Text(
-                                      'YES',
-                                      style: TextStyle(color: Colors.white),
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: Text(
+                                          'YES',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                    color: Colors.black,
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'FINAL ACCEPT',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            'FINAL ACCEPT',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(
-                height: 40,
-              ),
-            ]),
+                  SizedBox(
+                    height: 40,
+                  ),
+                ]),
           ),
         ),
       ),
@@ -350,22 +414,26 @@ class Event_Detail_Column extends StatelessWidget {
       venue,
       description;
 
-  final List<String> faculties_involved;
+  final List<dynamic> faculties_involved;
   final bool isCompleted;
 
   List<Widget> facultylist(BuildContext context) {
     List<Widget> FacultiesInvolvedList = [];
 
-    for (String faculty in faculties_involved) {
-      if (faculties_involved.last != faculty) {
+    for (dynamic faculty in faculties_involved) {
+      if (faculties_involved.last.toString() != faculty.toString()) {
         FacultiesInvolvedList.add(TextButton(
           onPressed: () {
-            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-              builder: (context) => Faculty_profile(),
-            ));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Faculty_profile(
+                    facultyMail: faculty.toString(),
+                  ),
+                ));
           },
           child: Text(
-            faculty,
+            faculty.toString(),
             style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 20,

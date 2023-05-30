@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/pending_event_details.dart';
 import 'package:event_consent2/student_event_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -111,24 +112,18 @@ class MessageStream extends StatelessWidget {
             // final messageText = message.data()['text'];
             // final messageSender = message.data()['sender'];
             // List facultiesInvolved = event.data()['Faculties Involved'];
-            if (loggedInUser.email ==
-                event.data()['FacultIies Involved'].last) {
+            if ((loggedInUser.email ==
+                    event.data()['FacultIies Involved'].last) &&
+                (event.data()['Status'] == 'ONGOING')) {
               final eventCard = EventCard(
                   eventTitle: event.data()['Event Name'],
                   eventId: event.data()['ID'].toString(),
                   date: event.data()['Date'],
                   student: event.data()['Generated User'],
                   eventstatus: 'ONGOING',
-                  nextpage: Student_event_details(
-                      name: event.data()['Event Name'],
-                      id: event.data()['ID'].toString(),
-                      date: event.data()['Date'],
-                      student: event.data()['Generated User'],
-                      eventStartTime: event.data()['Event Start Time'],
-                      eventEndTime: event.data()['Event End Time'],
-                      venue: event.data()['Venue'],
-                      description: event.data()['Event Description'],
-                      facultiesInvolved: event.data()['FacultIies Involved']),
+                  nextpage: Pending_Event_Details(
+                    eventDocumentID: event.id,
+                  ),
                   context: context);
               EventRequests.add(eventCard);
             }
