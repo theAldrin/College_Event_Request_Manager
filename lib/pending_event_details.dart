@@ -14,19 +14,19 @@ final _firestore = FirebaseFirestore.instance;
 dynamic loggedInUser;
 
 class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
-  late List<String> facultyMails;
+  late List<String> facultyMails = [];
   final _auth = FirebaseAuth.instance;
 
-  late String id,
-      date,
-      student,
-      eventStartTime,
-      eventEndTime,
-      venue,
-      description,
-      name,
-      status;
-  late List<dynamic> facultiesInvolved;
+  late String id = '',
+      date = '',
+      student = '',
+      eventStartTime = '',
+      eventEndTime = '',
+      venue = '',
+      description = '',
+      name = '',
+      status = '';
+  late List<dynamic> facultiesInvolved = [];
 
   void getCurrentUser() async {
     try {
@@ -44,16 +44,18 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
         .collection("Event Request")
         .doc(widget.eventDocumentID)
         .get();
-    name = event.data()?['Event Name'];
-    id = event.data()!['ID'].toString();
-    date = event.data()?['Date'];
-    student = event.data()?['Generated User'];
-    eventStartTime = event.data()?['Event Start Time'];
-    eventEndTime = event.data()?['Event End Time'];
-    venue = event.data()?['Venue'];
-    description = event.data()?['Event Description'];
-    facultiesInvolved = event.data()?['FacultIies Involved'];
-    status = event.data()?['Status'];
+    setState(() {
+      name = event.data()?['Event Name'];
+      id = event.data()!['ID'].toString();
+      date = event.data()?['Date'];
+      student = event.data()?['Generated User'];
+      eventStartTime = event.data()?['Event Start Time'];
+      eventEndTime = event.data()?['Event End Time'];
+      venue = event.data()?['Venue'];
+      description = event.data()?['Event Description'];
+      facultiesInvolved = event.data()?['FacultIies Involved'];
+      status = event.data()?['Status'];
+    });
   }
 
   void getallFaculties() async {
@@ -61,8 +63,10 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
         await _firestore.collection('Faculty User Details').get();
     final faculties = facultyData.docs;
     for (var faculty in faculties) {
-      if (faculty.data()['Email'] != loggedInUser.email) {
-        facultyMails.add(faculty.data()['Email']);
+      if ((faculty.data()['Email'] != loggedInUser.email)) {
+        setState(() {
+          facultyMails.add(faculty.data()['Email']);
+        });
       }
     }
   }
@@ -72,15 +76,15 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
     // TODO: implement initState
     super.initState();
     getCurrentUser();
-    getallFaculties();
     getData();
+    getallFaculties();
   }
 
   Widget _title() {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: 'Flutter Workshop',
+        text: name,
         style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w700,
@@ -93,6 +97,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
 
   @override
   Widget build(BuildContext context) {
+    facultyMails.remove(student);
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Color(0xFFF8F4F2),
@@ -215,7 +220,14 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                       child: InkWell(
                         onTap: () {
                           // Action to perform when the button is pressed
-
+                          facultiesInvolved.add(_selectedOption);
+                          final data = {
+                            "FacultIies Involved": facultiesInvolved
+                          };
+                          _firestore
+                              .collection("Event Request")
+                              .doc(widget.eventDocumentID)
+                              .set(data, SetOptions(merge: true));
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -226,6 +238,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
+                                        Navigator.pop(context);
                                         Navigator.pop(context);
                                       },
                                       child: Container(
@@ -299,6 +312,19 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                                                   TextButton(
                                                     onPressed: () {
                                                       Navigator.pop(context);
+                                                      final data = {
+                                                        "Status":
+                                                            'FINAL FACULTY ACCEPTED'
+                                                      };
+                                                      _firestore
+                                                          .collection(
+                                                              "Event Request")
+                                                          .doc(widget
+                                                              .eventDocumentID)
+                                                          .set(
+                                                              data,
+                                                              SetOptions(
+                                                                  merge: true));
                                                       showDialog(
                                                         context: context,
                                                         builder: (BuildContext
@@ -312,6 +338,8 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                                                                 TextButton(
                                                                   onPressed:
                                                                       () {
+                                                                    Navigator.pop(
+                                                                        context);
                                                                     Navigator.pop(
                                                                         context);
                                                                   },

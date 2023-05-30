@@ -49,13 +49,12 @@ class _Facluty_homeState extends State<Facluty_home> {
 
   @override
   Widget build(BuildContext context) {
-    print(currentUserEmail);
     return Scaffold(
       body: PageView(
         controller: _pageViewController,
         children: <Widget>[
           Faculty_profile(
-            facultyMail: 'xyz',
+            facultyMail: currentUserEmail,
           ),
           Event_history(),
           Event_request(),

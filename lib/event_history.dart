@@ -114,13 +114,25 @@ class MessageStream extends StatelessWidget {
           for (var event in events!) {
             // final messageText = message.data()['text'];
             // final messageSender = message.data()['sender'];
-            if (loggedInUser.email == event.data()['Generated User']) {
+            bool flag = false;
+            for (String facultyMails in event.data()['FacultIies Involved']) {
+              if ((loggedInUser.email == facultyMails) &&
+                  (event.data()['FacultIies Involved'].last != facultyMails)) {
+                flag = true;
+              }
+              if ((event.data()['Status'] != 'ONGOING') &&
+                  (event.data()['FacultIies Involved'].last == facultyMails) &&
+                  (loggedInUser.email == facultyMails)) {
+                flag = true;
+              }
+            }
+            if (loggedInUser.email == event.data()['Generated User'] || flag) {
               final eventCard = EventCard(
                   eventTitle: event.data()['Event Name'],
                   eventId: event.data()['ID'].toString(),
                   date: event.data()['Date'],
                   student: event.data()['Generated User'],
-                  eventstatus: 'ONGOING',
+                  eventstatus: event.data()['Status'],
                   nextpage: Student_event_details(
                     name: event.data()['Event Name'],
                     id: event.data()['ID'].toString(),
