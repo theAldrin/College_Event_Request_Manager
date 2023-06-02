@@ -88,7 +88,7 @@ class Event_Detail_Column extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Venue_detail_edit(),
+                        builder: (context) => Text('hi chellom'),
                       ));
                 },
                 child: Container(
