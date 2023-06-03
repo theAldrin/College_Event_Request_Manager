@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'student_event_details.dart';
+import 'student_faculty_event_details.dart';
 
 class All_events extends StatefulWidget {
   const All_events({Key? key}) : super(key: key);
@@ -99,18 +99,20 @@ class MessageStream extends StatelessWidget {
                 date: event.data()['Date'],
                 student: event.data()['Generated User'],
                 eventstatus: 'ONGOING',
-                nextpage: Student_event_details(
-                    //TODO: CUSTOM ADMIN EVENT DETAIL PAGE WITH VARIOUS FUNCTIONALITIES
-                    status: event.data()['Status'],
-                    name: event.data()['Event Name'],
-                    id: event.data()['ID'].toString(),
-                    date: event.data()['Date'],
-                    student: event.data()['Generated User'],
-                    eventStartTime: event.data()['Event Start Time'],
-                    eventEndTime: event.data()['Event End Time'],
-                    venue: event.data()['Venue'],
-                    description: event.data()['Event Description'],
-                    facultiesInvolved: event.data()['FacultIies Involved']),
+                nextpage: Student_Faculty_event_details(
+                  //TODO: CUSTOM ADMIN EVENT DETAIL PAGE WITH VARIOUS FUNCTIONALITIES
+                  status: event.data()['Status'],
+                  name: event.data()['Event Name'],
+                  id: event.data()['ID'].toString(),
+                  date: event.data()['Date'],
+                  student: event.data()['Generated User'],
+                  eventStartTime: event.data()['Event Start Time'],
+                  eventEndTime: event.data()['Event End Time'],
+                  venue: event.data()['Venue'],
+                  description: event.data()['Event Description'],
+                  facultiesInvolved: event.data()['FacultIies Involved'],
+                  userType: 'ADMINISTRATOR',
+                ),
                 context: context);
             EventRequests.add(eventCard);
           }

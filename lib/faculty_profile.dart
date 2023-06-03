@@ -14,6 +14,29 @@ class Faculty_profile extends StatefulWidget {
 final _firestore = FirebaseFirestore.instance;
 
 class _Faculty_profileState extends State<Faculty_profile> {
+  final _auth = FirebaseAuth.instance;
+  late String currentUserEmail = '';
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUserEmail = user.email!;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getData();
+  }
+
   void getData() async {
     await for (var snapshot
         in _firestore.collection('Faculty User Details').snapshots()) {
@@ -33,42 +56,40 @@ class _Faculty_profileState extends State<Faculty_profile> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getData();
-  }
-
   Widget _submitButton() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Faculty_profile_edit(),
-            ));
-      },
-      child: Container(
-        margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(vertical: 15),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            // boxShadow: <BoxShadow>[
-            //   BoxShadow(
-            //       color: Colors.grey.shade900,
-            //       offset: Offset(2, 4),
-            //       blurRadius: 5,
-            //       spreadRadius: 2)
-            // ],
-            color: Color(0xFF000000)),
-        child: Text(
-          'EDIT',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+    if (currentUserEmail == widget.facultyMail) {
+      return GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Faculty_profile_edit(),
+              ));
+        },
+        child: Container(
+          margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              // boxShadow: <BoxShadow>[
+              //   BoxShadow(
+              //       color: Colors.grey.shade900,
+              //       offset: Offset(2, 4),
+              //       blurRadius: 5,
+              //       spreadRadius: 2)
+              // ],
+              color: Color(0xFF000000)),
+          child: Text(
+            'EDIT',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Text('');
+    }
   }
 
   String name = '',

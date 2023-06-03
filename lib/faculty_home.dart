@@ -15,7 +15,6 @@ class Facluty_home extends StatefulWidget {
 
 class _Facluty_homeState extends State<Facluty_home> {
   final _auth = FirebaseAuth.instance;
-  dynamic loggedInUser;
   late String currentUserEmail;
 
   void getCurrentUser() async {
@@ -56,8 +55,12 @@ class _Facluty_homeState extends State<Facluty_home> {
           Faculty_profile(
             facultyMail: currentUserEmail,
           ),
-          Event_history(),
-          Event_request(),
+          Event_history(
+            userType: 'FACULTY',
+          ),
+          Event_request(
+            userType: 'FACULTY',
+          ),
           Pending_events(),
           Calendar()
         ],

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'student_event_details.dart';
+import 'student_faculty_event_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Event_history extends StatefulWidget {
-  const Event_history({Key? key}) : super(key: key);
-
+  Event_history({required this.userType});
+  String userType;
   @override
   State<Event_history> createState() => _Event_historyState();
 }
@@ -87,7 +87,9 @@ class _Event_historyState extends State<Event_history> {
                 },
               ),
               //
-              MessageStream()
+              MessageStream(
+                userType: widget.userType,
+              )
             ],
           ),
         ),
@@ -97,6 +99,8 @@ class _Event_historyState extends State<Event_history> {
 }
 
 class MessageStream extends StatelessWidget {
+  MessageStream({required this.userType});
+  String userType;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -133,7 +137,7 @@ class MessageStream extends StatelessWidget {
                   date: event.data()['Date'],
                   student: event.data()['Generated User'],
                   eventstatus: event.data()['Status'],
-                  nextpage: Student_event_details(
+                  nextpage: Student_Faculty_event_details(
                     name: event.data()['Event Name'],
                     id: event.data()['ID'].toString(),
                     date: event.data()['Date'],
@@ -144,6 +148,7 @@ class MessageStream extends StatelessWidget {
                     description: event.data()['Event Description'],
                     facultiesInvolved: event.data()['FacultIies Involved'],
                     status: event.data()['Status'],
+                    userType: event.data()['User Type'],
                   ),
                   context: context);
               EventRequests.add(eventCard);

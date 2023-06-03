@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/venue_detail_edit.dart';
 import 'package:flutter/material.dart';
-import 'venue_details.dart';
 
 class Venues extends StatefulWidget {
   const Venues({Key? key}) : super(key: key);

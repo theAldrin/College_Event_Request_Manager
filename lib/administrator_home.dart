@@ -1,5 +1,6 @@
 import 'package:event_consent2/calendar.dart';
 import 'package:event_consent2/event_request.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'admininstrator_profile.dart';
 import 'all_events.dart';
@@ -13,6 +14,28 @@ class Administrator_home extends StatefulWidget {
 }
 
 class _Administrator_homeState extends State<Administrator_home> {
+  final _auth = FirebaseAuth.instance;
+  late String currentUserEmail;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUserEmail = user.email!;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
   final _pageViewController = PageController();
 
   int _activePage = 0;
@@ -29,9 +52,13 @@ class _Administrator_homeState extends State<Administrator_home> {
       body: PageView(
         controller: _pageViewController,
         children: <Widget>[
-          Administrator_profile(),
+          Administrator_profile(
+            adminMail: currentUserEmail,
+          ),
           All_events(),
-          Event_request(),
+          Event_request(
+            userType: 'ADMINISTRATOR',
+          ),
           Venues(),
           Calendar()
         ],

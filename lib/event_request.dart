@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Event_request extends StatefulWidget {
-  const Event_request({Key? key}) : super(key: key);
+  Event_request({required this.userType});
+  String userType;
 
   @override
   State<Event_request> createState() => _Event_requestState();
@@ -39,7 +40,6 @@ class _Event_requestState extends State<Event_request> {
 
   void getAllVenues() async {
     await for (var snapshot in _firestore.collection('Venues').snapshots()) {
-      //venuesList.remove('');
       for (var venue1 in snapshot.docs) {
         venuesList.add(venue1.data()['Name']);
       }
@@ -84,6 +84,8 @@ class _Event_requestState extends State<Event_request> {
       ),
     );
   }
+
+  late int clashFlag;
 
   @override
   Widget build(BuildContext context) {
@@ -361,13 +363,66 @@ class _Event_requestState extends State<Event_request> {
                 children: [
                   Expanded(
                     child: TextButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Expanded(
-                              child: AlertDialog(
-                                title: Text('Date, Time and Venue Verified'),
+                      onPressed: () async {
+                        clashFlag = 0;
+                        final eventCollection =
+                            await _firestore.collection('Event Request').get();
+                        for (var event in eventCollection.docs) {
+                          // DateTime tempDate = new DateFormat("dd-MM-yyyy")
+                          //     .parse(event.data()['Date']);
+                          // String datesh = DateFormat("yyyy-MM-dd hh:mm:ss")
+                          //     .format(tempDate);
+                          // print(datesh);
+                          if ((event.data()['Date'] == formattedDate) &&
+                              (event.data()['Venue'] == venue)) {
+                            //TODO: Admin accepted status check
+                            DateTime thisEventStartTime =
+                                new DateFormat("hh:mm")
+                                    .parse(formattedStartTime);
+
+                            DateTime thisEventEndTime =
+                                new DateFormat("hh:mm").parse(formattedEndTime);
+                            // String datesh = DateFormat("yyyy-MM-dd hh:mm:ss")
+                            //     .format(thisEventEndTime);
+                            // print(datesh);
+                            DateTime databaseEventStartTime =
+                                new DateFormat("hh:mm")
+                                    .parse(event.data()['Event Start Time']);
+                            DateTime databaseEventEndTime =
+                                new DateFormat("hh:mm")
+                                    .parse(event.data()['Event End Time']);
+                            if ((thisEventStartTime.isAtSameMomentAs(
+                                    databaseEventStartTime)) ||
+                                (thisEventStartTime
+                                    .isAtSameMomentAs(databaseEventEndTime)) ||
+                                ((thisEventStartTime
+                                        .isAfter(databaseEventStartTime)) &&
+                                    (thisEventStartTime
+                                        .isBefore(databaseEventEndTime))) ||
+                                (thisEventEndTime.isAtSameMomentAs(
+                                    databaseEventStartTime)) ||
+                                (thisEventEndTime
+                                    .isAtSameMomentAs(databaseEventEndTime)) ||
+                                ((thisEventEndTime
+                                        .isAfter(databaseEventStartTime)) &&
+                                    (thisEventEndTime
+                                        .isBefore(databaseEventEndTime))) ||
+                                ((thisEventStartTime
+                                        .isBefore(databaseEventStartTime)) &&
+                                    (thisEventEndTime
+                                        .isAfter(databaseEventEndTime)))) {
+                              clashFlag = 1;
+                            }
+                          }
+                        }
+                        if (clashFlag == 1) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('ATTENTION!!!'),
+                                content: Text(
+                                    'Your Event Clashes with another Event. Please change the time and try again'),
                                 // content: Text('GeeksforGeeks'),
                                 actions: [
                                   TextButton(
@@ -384,10 +439,90 @@ class _Event_requestState extends State<Event_request> {
                                     ),
                                   ),
                                 ],
-                              ),
-                            );
-                          },
-                        );
+                              );
+                            },
+                          );
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Date, Time and Venue Verified'),
+                                content: Text('Please Submit the Event'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () async {
+                                      final constantDB = await _firestore
+                                          .collection('Constants')
+                                          .get();
+                                      final constant = constantDB.docs[0];
+                                      int id = constant.data()['Event ID'];
+                                      ++id;
+                                      await _firestore
+                                          .collection('Constants')
+                                          .doc('gaLPmBXkrPt1m6I31CjJ')
+                                          .update({'Event ID': id});
+                                      await _firestore
+                                          .collection('Event Request')
+                                          .add({
+                                        'ID': id,
+                                        'Event Name': eventName,
+                                        'Date': formattedDate,
+                                        'Event Start Time': formattedStartTime,
+                                        'Event End Time': formattedEndTime,
+                                        'Venue': venue,
+                                        'Event Description': description,
+                                        'FacultIies Involved': [faculty],
+                                        'Generated User': loggedInUser.email,
+                                        'Status': 'ONGOING',
+                                        'TimeStamp':
+                                            FieldValue.serverTimestamp(),
+                                        'User Type': widget.userType
+                                      });
+                                      Navigator.pop(context);
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Expanded(
+                                            child: AlertDialog(
+                                              title: Text(
+                                                  'Event Request has been submitted succesfully'),
+                                              // content: Text('GeeksforGeeks'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(10),
+                                                    child: Text(
+                                                      'OK',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      child: Text(
+                                        'SUBMIT',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 15),
@@ -416,89 +551,89 @@ class _Event_requestState extends State<Event_request> {
                       ),
                     ),
                   ), //verify button functionality
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () async {
-                        final constantDB =
-                            await _firestore.collection('Constants').get();
-                        final constant = constantDB.docs[0];
-                        int id = constant.data()['Event ID'];
-                        ++id;
-                        await _firestore
-                            .collection('Constants')
-                            .doc('gaLPmBXkrPt1m6I31CjJ')
-                            .update({'Event ID': id});
-                        await _firestore.collection('Event Request').add({
-                          'ID': id,
-                          'Event Name': eventName,
-                          'Date': formattedDate,
-                          'Event Start Time': formattedStartTime,
-                          'Event End Time': formattedEndTime,
-                          'Venue': venue,
-                          'Event Description': description,
-                          'FacultIies Involved': [faculty],
-                          'Generated User': loggedInUser.email,
-                          'Status': 'ONGOING',
-                          'TimeStamp': FieldValue.serverTimestamp()
-                        });
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Expanded(
-                              child: AlertDialog(
-                                title: Text(
-                                    'Event Request has been submitted succesfully'),
-                                // content: Text('GeeksforGeeks'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.all(10),
-                                      child: Text(
-                                        'OK',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                  color: Colors.grey.shade200,
-                                  offset: Offset(2, 4),
-                                  blurRadius: 5,
-                                  spreadRadius: 2)
-                            ],
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xfffbb448),
-                                  Color(0xfff7892b)
-                                ])),
-                        child: Center(
-                          child: Text(
-                            'SUBMIT',
-                            style: TextStyle(fontSize: 20, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ), //Submit button functionality
+                  // SizedBox(
+                  //   width: 20,
+                  // ),
+                  // Expanded(
+                  //   child: TextButton(
+                  //     onPressed: () async {
+                  //       final constantDB =
+                  //           await _firestore.collection('Constants').get();
+                  //       final constant = constantDB.docs[0];
+                  //       int id = constant.data()['Event ID'];
+                  //       ++id;
+                  //       await _firestore
+                  //           .collection('Constants')
+                  //           .doc('gaLPmBXkrPt1m6I31CjJ')
+                  //           .update({'Event ID': id});
+                  //       await _firestore.collection('Event Request').add({
+                  //         'ID': id,
+                  //         'Event Name': eventName,
+                  //         'Date': formattedDate,
+                  //         'Event Start Time': formattedStartTime,
+                  //         'Event End Time': formattedEndTime,
+                  //         'Venue': venue,
+                  //         'Event Description': description,
+                  //         'FacultIies Involved': [faculty],
+                  //         'Generated User': loggedInUser.email,
+                  //         'Status': 'ONGOING',
+                  //         'TimeStamp': FieldValue.serverTimestamp()
+                  //       });
+                  //       showDialog(
+                  //         context: context,
+                  //         builder: (BuildContext context) {
+                  //           return Expanded(
+                  //             child: AlertDialog(
+                  //               title: Text(
+                  //                   'Event Request has been submitted succesfully'),
+                  //               // content: Text('GeeksforGeeks'),
+                  //               actions: [
+                  //                 TextButton(
+                  //                   onPressed: () {
+                  //                     Navigator.pop(context);
+                  //                   },
+                  //                   child: Container(
+                  //                     padding: EdgeInsets.all(10),
+                  //                     child: Text(
+                  //                       'OK',
+                  //                       style: TextStyle(color: Colors.white),
+                  //                     ),
+                  //                     color: Colors.black,
+                  //                   ),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           );
+                  //         },
+                  //       );
+                  //     },
+                  //     child: Container(
+                  //       padding: EdgeInsets.symmetric(vertical: 15),
+                  //       decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.all(Radius.circular(5)),
+                  //           boxShadow: <BoxShadow>[
+                  //             BoxShadow(
+                  //                 color: Colors.grey.shade200,
+                  //                 offset: Offset(2, 4),
+                  //                 blurRadius: 5,
+                  //                 spreadRadius: 2)
+                  //           ],
+                  //           gradient: LinearGradient(
+                  //               begin: Alignment.centerLeft,
+                  //               end: Alignment.centerRight,
+                  //               colors: [
+                  //                 Color(0xfffbb448),
+                  //                 Color(0xfff7892b)
+                  //               ])),
+                  //       child: Center(
+                  //         child: Text(
+                  //           'SUBMIT',
+                  //           style: TextStyle(fontSize: 20, color: Colors.white),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ), //Submit button functionality
                 ],
               ),
               SizedBox(height: 30),

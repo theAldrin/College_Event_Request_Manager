@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'student_profile_edit.dart';
 
 class Student_Profile extends StatefulWidget {
-  const Student_Profile({Key? key}) : super(key: key);
-
+  Student_Profile({required this.studentMail});
+  final String studentMail;
   @override
   State<Student_Profile> createState() => _Student_ProfileState();
 }
@@ -15,23 +15,33 @@ dynamic loggedInUser;
 
 class _Student_ProfileState extends State<Student_Profile> {
   final _auth = FirebaseAuth.instance;
+  late String currentUserEmail = '';
 
   void getCurrentUser() async {
     try {
       final user = await _auth.currentUser;
       if (user != null) {
-        loggedInUser = user;
+        setState(() {
+          currentUserEmail = user.email!;
+        });
       }
     } catch (e) {
       print(e);
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getData();
+  }
+
   void getData() async {
     await for (var snapshot
         in _firestore.collection('Student User Details').snapshots()) {
       for (var user in snapshot.docs) {
-        if (loggedInUser.email == user.data()['Email']) {
+        if (widget.studentMail == user.data()['Email']) {
           setState(() {
             name = user.data()['Name'];
             college = user.data()['College'];
@@ -55,43 +65,40 @@ class _Student_ProfileState extends State<Student_Profile> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getCurrentUser();
-    getData();
-  }
-
   Widget _submitButton() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Student_profile_edit(),
-            ));
-      },
-      child: Container(
-        margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(vertical: 15),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            // boxShadow: <BoxShadow>[
-            //   BoxShadow(
-            //       color: Colors.grey.shade900,
-            //       offset: Offset(2, 4),
-            //       blurRadius: 5,
-            //       spreadRadius: 2)
-            // ],
-            color: Color(0xFF000000)),
-        child: Text(
-          'EDIT',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+    if (currentUserEmail == widget.studentMail) {
+      return GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Student_profile_edit(),
+              ));
+        },
+        child: Container(
+          margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              // boxShadow: <BoxShadow>[
+              //   BoxShadow(
+              //       color: Colors.grey.shade900,
+              //       offset: Offset(2, 4),
+              //       blurRadius: 5,
+              //       spreadRadius: 2)
+              // ],
+              color: Color(0xFF000000)),
+          child: Text(
+            'EDIT',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Text('');
+    }
   }
 
   String name = '',

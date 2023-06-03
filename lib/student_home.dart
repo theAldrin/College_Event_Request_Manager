@@ -1,4 +1,5 @@
 import 'package:event_consent2/calendar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'student_profile.dart';
 import 'event_request.dart';
@@ -12,6 +13,28 @@ class Student_home extends StatefulWidget {
 }
 
 class _Student_homeState extends State<Student_home> {
+  final _auth = FirebaseAuth.instance;
+  late String currentUserEmail;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        setState(() {
+          currentUserEmail = user.email!;
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
   final _pageViewController = PageController();
 
   int _activePage = 0;
@@ -28,9 +51,15 @@ class _Student_homeState extends State<Student_home> {
       body: PageView(
         controller: _pageViewController,
         children: <Widget>[
-          Student_Profile(),
-          Event_history(),
-          Event_request(),
+          Student_Profile(
+            studentMail: currentUserEmail,
+          ),
+          Event_history(
+            userType: 'STUDENT',
+          ),
+          Event_request(
+            userType: 'STUDENT',
+          ),
           Calendar()
         ],
         onPageChanged: (index) {

@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Administrator_profile extends StatefulWidget {
-  const Administrator_profile({Key? key}) : super(key: key);
+  Administrator_profile({required this.adminMail});
+  String adminMail;
 
   @override
   State<Administrator_profile> createState() => _Administrator_profileState();
@@ -15,12 +16,13 @@ dynamic loggedInUser;
 
 class _Administrator_profileState extends State<Administrator_profile> {
   final _auth = FirebaseAuth.instance;
+  String currentUserEmail = '';
 
   void getCurrentUser() async {
     try {
       final user = await _auth.currentUser;
       if (user != null) {
-        loggedInUser = user;
+        currentUserEmail = user.email!;
       }
     } catch (e) {
       print(e);
@@ -31,7 +33,7 @@ class _Administrator_profileState extends State<Administrator_profile> {
     await for (var snapshot
         in _firestore.collection('Administrator User Details').snapshots()) {
       for (var user in snapshot.docs) {
-        if (loggedInUser.email == user.data()['Email']) {
+        if (widget.adminMail == user.data()['Email']) {
           setState(() {
             name = user.data()['Name'];
             college = user.data()['College'];
@@ -51,35 +53,39 @@ class _Administrator_profileState extends State<Administrator_profile> {
   }
 
   Widget _submitButton() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Administrator_profile_edit(),
-            ));
-      },
-      child: Container(
-        margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
-        width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(vertical: 15),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            // boxShadow: <BoxShadow>[
-            //   BoxShadow(
-            //       color: Colors.grey.shade900,
-            //       offset: Offset(2, 4),
-            //       blurRadius: 5,
-            //       spreadRadius: 2)
-            // ],
-            color: Color(0xFF000000)),
-        child: Text(
-          'EDIT',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+    if (currentUserEmail == widget.adminMail) {
+      return GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Administrator_profile_edit(),
+              ));
+        },
+        child: Container(
+          margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              // boxShadow: <BoxShadow>[
+              //   BoxShadow(
+              //       color: Colors.grey.shade900,
+              //       offset: Offset(2, 4),
+              //       blurRadius: 5,
+              //       spreadRadius: 2)
+              // ],
+              color: Color(0xFF000000)),
+          child: Text(
+            'EDIT',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Text('');
+    }
   }
 
   String name = '', college = '', email = '', phoneno = '';

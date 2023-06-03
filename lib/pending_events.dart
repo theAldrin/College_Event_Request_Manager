@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/pending_event_details.dart';
-import 'package:event_consent2/student_event_details.dart';
+import 'package:event_consent2/student_faculty_event_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
