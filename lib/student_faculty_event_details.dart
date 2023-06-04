@@ -19,7 +19,8 @@ class Student_Faculty_event_details extends StatefulWidget {
       required this.description,
       required this.facultiesInvolved,
       required this.status,
-      required this.userType});
+      required this.userType,
+      required this.reason});
   final String id,
       date,
       student,
@@ -29,7 +30,8 @@ class Student_Faculty_event_details extends StatefulWidget {
       description,
       name,
       status,
-      userType;
+      userType,
+      reason;
   final List<dynamic> facultiesInvolved;
 
   @override
@@ -105,6 +107,7 @@ class _Student_Faculty_event_detailsState
                       ? true
                       : false,
                   userType: widget.userType,
+                  reason: widget.reason,
                 )
               ]),
         ),
@@ -125,7 +128,8 @@ class Event_Detail_Column extends StatefulWidget {
       required this.faculties_involved,
       required this.isCompleted,
       required this.status,
-      required this.userType});
+      required this.userType,
+      required this.reason});
 
   final String id,
       date,
@@ -135,7 +139,8 @@ class Event_Detail_Column extends StatefulWidget {
       venue,
       description,
       status,
-      userType;
+      userType,
+      reason;
 
   final List<dynamic> faculties_involved;
   final bool isCompleted;
@@ -144,7 +149,11 @@ class Event_Detail_Column extends StatefulWidget {
   State<Event_Detail_Column> createState() => _Event_Detail_ColumnState();
 }
 
+String docID = '';
+
 class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
+  late String newReason;
+
   Widget _RequestWithdrawButton(BuildContext context) {
     if (widget.status != 'COMPLETED' && loggedInUser.email == widget.student) {
       return TextButton(
@@ -153,38 +162,99 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
           final events = eventData.docs;
           for (var event in events) {
             if (event.data()['ID'].toString() == widget.id) {
-              await _firestore
-                  .collection('Event Request')
-                  .doc(event.id)
-                  .delete();
+              docID = event.id;
             }
           }
-          showDialog(
+          showModalBottomSheet(
+            isScrollControlled: true,
             context: context,
-            builder: (BuildContext context) {
-              return Expanded(
-                child: AlertDialog(
-                  title: Text('Event Request is withdrawn succesfully'),
-                  // content: Text('GeeksforGeeks'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          'OK',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        color: Colors.black,
+            builder: (context) => SingleChildScrollView(
+                child: Container(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 30),
+              child: Container(
+                color: Color(0xFF757575),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(30),
+                          topLeft: Radius.circular(30))),
+                  padding: EdgeInsets.fromLTRB(40, 30, 40, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reason',
+                        style: TextStyle(
+                            color: Color(0xffe46b10),
+                            fontSize: 35,
+                            fontWeight: FontWeight.w700),
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        autofocus: true,
+                        style: TextStyle(fontSize: 15),
+                        maxLines: 250,
+                        minLines: 1,
+                        onChanged: (value) {
+                          newReason = value;
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 0.5),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 0.5),
+                          ),
+                          focusColor: Colors.grey,
+                          contentPadding: EdgeInsets.all(12),
+                          hintStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(width: 0.5)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(7),
+                          color: Colors.black,
+                        ),
+                        child: TextButton(
+                            onPressed: () {
+                              final data = {
+                                "Status": 'WITHDRAWN',
+                                "Reason For Removal": newReason
+                              };
+                              _firestore
+                                  .collection("Event Request")
+                                  .doc(docID)
+                                  .set(data, SetOptions(merge: true));
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'CONFIRM',
+                              style: TextStyle(color: Colors.white),
+                            )),
+                      )
+                    ],
+                  ),
                 ),
-              );
-            },
+              ),
+            )),
           );
         },
         child: Container(
@@ -216,22 +286,27 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
   }
 
   Widget bottompart(BuildContext context) {
-    String currentOrFinal;
+    String currentOrFinal = '';
     Widget lastButton;
-    if (widget.isCompleted == false) {
+    if (widget.status == 'ONGOING') {
       currentOrFinal = 'Current Faculty :';
       lastButton = _RequestWithdrawButton(context);
-    } else {
+    } else if (widget.status == 'FINAL FACULTY ACCEPTED' ||
+        widget.status == 'ADMIN ACCEPTED') {
       currentOrFinal = 'Final Accept By :';
       lastButton = _RequestWithdrawButton(context);
+    } else {
+      lastButton = Text('');
     }
 
     return Column(
       children: [
         Text(
           currentOrFinal,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+          textAlign: (currentOrFinal != '') ? TextAlign.center : null,
+          style: (currentOrFinal != '')
+              ? TextStyle(fontWeight: FontWeight.w900, fontSize: 30)
+              : null,
         ),
         TextButton(
           onPressed: () {
@@ -288,6 +363,18 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
       }
     }
     return FacultiesInvolvedList;
+  }
+
+  Widget reasonText() {
+    if (widget.status == 'WITHDRAWN' || widget.status == 'REJECTED') {
+      return Text(
+        'REASON : ' + widget.reason,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+      );
+    } else {
+      return Text('');
+    }
   }
 
   @override
@@ -394,6 +481,10 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
         ),
+        SizedBox(
+          height: 30,
+        ),
+        reasonText(),
         SizedBox(
           height: 30,
         ),

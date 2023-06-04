@@ -18,7 +18,7 @@ class _All_eventsState extends State<All_events> {
     return RichText(
       textAlign: TextAlign.left,
       text: TextSpan(
-        text: 'ALL EVENTS',
+        text: 'All Events',
         style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w700,
@@ -99,7 +99,7 @@ class MessageStream extends StatelessWidget {
                 eventId: event.data()['ID'].toString(),
                 date: event.data()['Date'],
                 student: event.data()['Generated User'],
-                eventstatus: 'ONGOING',
+                eventstatus: event.data()['Status'],
                 nextpage: Administrator_event_details(
                   status: event.data()['Status'],
                   name: event.data()['Event Name'],
@@ -113,6 +113,7 @@ class MessageStream extends StatelessWidget {
                   facultiesInvolved: event.data()['FacultIies Involved'],
                   userType: event.data()['User Type'],
                   docID: event.id,
+                  reason: event.data()['Reason For Removal'],
                 ),
                 context: context);
             EventRequests.add(eventCard);

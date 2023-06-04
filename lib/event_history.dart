@@ -149,6 +149,7 @@ class MessageStream extends StatelessWidget {
                     facultiesInvolved: event.data()['FacultIies Involved'],
                     status: event.data()['Status'],
                     userType: event.data()['User Type'],
+                    reason: event.data()['Reason For Removal'],
                   ),
                   context: context);
               EventRequests.add(eventCard);
