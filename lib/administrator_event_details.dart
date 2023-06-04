@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_consent2/admininstrator_profile.dart';
 import 'package:event_consent2/student_profile.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'admininstrator_profile.dart';
 import 'faculty_profile.dart';
 
-dynamic loggedInUser;
-
-class Student_Faculty_event_details extends StatefulWidget {
-  Student_Faculty_event_details(
+class Administrator_event_details extends StatefulWidget {
+  Administrator_event_details(
       {required this.name,
       required this.id,
       required this.date,
@@ -19,7 +17,8 @@ class Student_Faculty_event_details extends StatefulWidget {
       required this.description,
       required this.facultiesInvolved,
       required this.status,
-      required this.userType});
+      required this.userType,
+      required this.docID});
   final String id,
       date,
       student,
@@ -29,39 +28,19 @@ class Student_Faculty_event_details extends StatefulWidget {
       description,
       name,
       status,
-      userType;
+      userType,
+      docID;
   final List<dynamic> facultiesInvolved;
 
   @override
-  State<Student_Faculty_event_details> createState() =>
-      _Student_Faculty_event_detailsState();
+  State<Administrator_event_details> createState() =>
+      _Administrator_event_detailsState();
 }
 
 final _firestore = FirebaseFirestore.instance;
 
-class _Student_Faculty_event_detailsState
-    extends State<Student_Faculty_event_details> {
-  final _auth = FirebaseAuth.instance;
-
-  void getCurrentUser() async {
-    try {
-      final user = await _auth.currentUser;
-      if (user != null) {
-        setState(() {
-          loggedInUser = user;
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getCurrentUser();
-  }
-
+class _Administrator_event_detailsState
+    extends State<Administrator_event_details> {
   Widget _title() {
     return RichText(
       textAlign: TextAlign.center,
@@ -105,6 +84,7 @@ class _Student_Faculty_event_detailsState
                       ? true
                       : false,
                   userType: widget.userType,
+                  docID: widget.docID,
                 )
               ]),
         ),
@@ -125,7 +105,8 @@ class Event_Detail_Column extends StatefulWidget {
       required this.faculties_involved,
       required this.isCompleted,
       required this.status,
-      required this.userType});
+      required this.userType,
+      required this.docID});
 
   final String id,
       date,
@@ -135,7 +116,8 @@ class Event_Detail_Column extends StatefulWidget {
       venue,
       description,
       status,
-      userType;
+      userType,
+      docID;
 
   final List<dynamic> faculties_involved;
   final bool isCompleted;
@@ -145,20 +127,15 @@ class Event_Detail_Column extends StatefulWidget {
 }
 
 class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
-  Widget _RequestWithdrawButton(BuildContext context) {
-    if (widget.status != 'COMPLETED' && loggedInUser.email == widget.student) {
+  Widget _RejectButton(BuildContext context) {
+    if (widget.status != 'COMPLETED') {
       return TextButton(
         onPressed: () async {
-          final eventData = await _firestore.collection('Event Request').get();
-          final events = eventData.docs;
-          for (var event in events) {
-            if (event.data()['ID'].toString() == widget.id) {
-              await _firestore
-                  .collection('Event Request')
-                  .doc(event.id)
-                  .delete();
-            }
-          }
+          await _firestore
+              .collection('Event Request')
+              .doc(widget.docID)
+              .delete();
+
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -205,7 +182,73 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
                   end: Alignment.centerRight,
                   colors: [Color(0xfffbb448), Color(0xfff7892b)])),
           child: Text(
-            'WITHDRAW REQUEST',
+            'REJECT',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+      );
+    } else {
+      return Text('');
+    }
+  }
+
+  Widget _AdminAcceptButton(BuildContext context) {
+    if (widget.status != 'COMPLETED') {
+      return TextButton(
+        onPressed: () async {
+          final data = {"Status": 'ADMIN ACCEPTED'};
+          _firestore
+              .collection("Event Request")
+              .doc(widget.docID)
+              .set(data, SetOptions(merge: true));
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Expanded(
+                child: AlertDialog(
+                  title: Text('The Event Request has been Accepted'),
+                  // content: Text('GeeksforGeeks'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {});
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'OK',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                    color: Colors.grey.shade200,
+                    offset: Offset(2, 4),
+                    blurRadius: 5,
+                    spreadRadius: 2)
+              ],
+              gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+          child: Text(
+            'ACCEPT',
             style: TextStyle(fontSize: 20, color: Colors.white),
           ),
         ),
@@ -217,15 +260,25 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
 
   Widget bottompart(BuildContext context) {
     String currentOrFinal;
-    Widget lastButton;
+    Widget rejectButtton;
+    Widget adminAcceptButton;
     if (widget.isCompleted == false) {
       currentOrFinal = 'Current Faculty :';
-      lastButton = _RequestWithdrawButton(context);
+      rejectButtton = _RejectButton(context);
+      adminAcceptButton = Text('');
     } else {
-      currentOrFinal = 'Final Accept By :';
-      lastButton = _RequestWithdrawButton(context);
+      currentOrFinal = 'Final Faculty :';
+      if (widget.status != 'COMPLETED') {
+        rejectButtton = _RejectButton(context);
+      } else {
+        rejectButtton = Text('');
+      }
+      if (widget.status == 'FINAL FACULTY ACCEPTED') {
+        adminAcceptButton = _AdminAcceptButton(context);
+      } else {
+        adminAcceptButton = Text('');
+      }
     }
-
     return Column(
       children: [
         Text(
@@ -254,10 +307,11 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
         SizedBox(
           height: 20,
         ),
-        lastButton,
+        rejectButtton,
         SizedBox(
           height: 30,
-        )
+        ),
+        adminAcceptButton
       ],
     );
   }

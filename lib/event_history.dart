@@ -51,7 +51,7 @@ class _Event_historyState extends State<Event_history> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Color(0x0ff3892b),
+        backgroundColor: Color(0xffffff),
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

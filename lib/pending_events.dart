@@ -52,7 +52,7 @@ class _Pending_eventsState extends State<Pending_events> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Color(0x0ff3892b),
+        backgroundColor: Color(0xffffffff),
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

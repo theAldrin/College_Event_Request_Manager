@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/student_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'admininstrator_profile.dart';
 import 'faculty_profile.dart';
 
 class Pending_Event_Details extends StatefulWidget {
@@ -12,6 +15,7 @@ class Pending_Event_Details extends StatefulWidget {
 
 final _firestore = FirebaseFirestore.instance;
 dynamic loggedInUser;
+int clashFlag = 0;
 
 class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
   late List<String> facultyMails = [];
@@ -25,7 +29,8 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
       venue = '',
       description = '',
       name = '',
-      status = '';
+      status = '',
+      userType = '';
   late List<dynamic> facultiesInvolved = [];
 
   void getCurrentUser() async {
@@ -55,6 +60,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
       description = event.data()?['Event Description'];
       facultiesInvolved = event.data()?['FacultIies Involved'];
       status = event.data()?['Status'];
+      userType = event.data()?['User Type'];
     });
   }
 
@@ -94,6 +100,368 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
   }
 
   String? _selectedOption;
+  int flagVerify = 0;
+
+  Widget bottomPart() {
+    if (flagVerify == 0) {
+      return SizedBox(
+        width: double.infinity,
+        child: Card(
+          color: Color(0xfff7892b),
+          child: InkWell(
+            onTap: () async {
+              // Action to perform when the button is pressed
+              clashFlag = 0;
+              final eventCollection =
+                  await _firestore.collection('Event Request').get();
+              for (var event in eventCollection.docs) {
+                // DateTime tempDate = new DateFormat("dd-MM-yyyy")
+                //     .parse(event.data()['Date']);
+                // String datesh = DateFormat("yyyy-MM-dd hh:mm:ss")
+                //     .format(tempDate);
+                // print(datesh);
+                if ((event.data()['Date'] == date) &&
+                    (event.data()['Venue'] == venue) &&
+                    (event.data()['ID'].toString() != id)) {
+                  //TODO: Admin accepted status check
+                  DateTime thisEventStartTime =
+                      new DateFormat("hh:mm").parse(eventStartTime);
+
+                  DateTime thisEventEndTime =
+                      new DateFormat("hh:mm").parse(eventEndTime);
+                  // String datesh = DateFormat("yyyy-MM-dd hh:mm:ss")
+                  //     .format(thisEventEndTime);
+                  // print(datesh);
+                  DateTime databaseEventStartTime = new DateFormat("hh:mm")
+                      .parse(event.data()['Event Start Time']);
+                  DateTime databaseEventEndTime = new DateFormat("hh:mm")
+                      .parse(event.data()['Event End Time']);
+                  if ((thisEventStartTime
+                          .isAtSameMomentAs(databaseEventStartTime)) ||
+                      (thisEventStartTime
+                          .isAtSameMomentAs(databaseEventEndTime)) ||
+                      ((thisEventStartTime.isAfter(databaseEventStartTime)) &&
+                          (thisEventStartTime
+                              .isBefore(databaseEventEndTime))) ||
+                      (thisEventEndTime
+                          .isAtSameMomentAs(databaseEventStartTime)) ||
+                      (thisEventEndTime
+                          .isAtSameMomentAs(databaseEventEndTime)) ||
+                      ((thisEventEndTime.isAfter(databaseEventStartTime)) &&
+                          (thisEventEndTime.isBefore(databaseEventEndTime))) ||
+                      ((thisEventStartTime.isBefore(databaseEventStartTime)) &&
+                          (thisEventEndTime.isAfter(databaseEventEndTime)))) {
+                    clashFlag = 1;
+                  }
+                }
+              }
+              if (clashFlag == 1) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('ATTENTION!!!'),
+                      content: Text(
+                          'The event clashes with other preplanned Event. Please Reject it'),
+                      // content: Text('GeeksforGeeks'),
+                      actions: [
+                        TextButton(
+                          onPressed: () async {
+                            await _firestore
+                                .collection('Event Request')
+                                .doc(widget.eventDocumentID)
+                                .delete();
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              'REJECT',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Date, Time and Venue Verified'),
+                      content:
+                          Text('Please forward the Event or give Final accept'),
+                      actions: [
+                        TextButton(
+                          onPressed: () async {
+                            setState(() {
+                              flagVerify = 1;
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              'OK',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'VERIFY',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Column(
+        children: [
+          Text(
+            'Forward To',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          DropdownButton<String>(
+            isExpanded: true,
+            iconEnabledColor: Color(0xfff7892b),
+            iconSize: 60,
+            value: _selectedOption,
+            items: facultyMails.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              // Change function parameter to nullable string
+              setState(() {
+                _selectedOption = newValue;
+              });
+            },
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              color: Color(0xfff7892b),
+              child: InkWell(
+                onTap: () {
+                  if (_selectedOption != null) {
+                    // Action to perform when the button is pressed
+                    facultiesInvolved.add(_selectedOption);
+                    final data = {"FacultIies Involved": facultiesInvolved};
+                    _firestore
+                        .collection("Event Request")
+                        .doc(widget.eventDocumentID)
+                        .set(data, SetOptions(merge: true));
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Expanded(
+                          child: AlertDialog(
+                            title: Text('Event request forwarded'),
+                            // content: Text('GeeksforGeeks'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'FORWARD',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            'OR',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              color: Color(0xfff7892b),
+              child: InkWell(
+                onTap: () {
+                  // Action to perform when the button is pressed
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Expanded(
+                        child: AlertDialog(
+                          title: Text('ATTENTION !!!'),
+                          content: Text(
+                              'Are you sure you have the authority to give final accept this event request'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Expanded(
+                                      child: AlertDialog(
+                                        title: Text(
+                                            'Do you want to give final accept to this event Request'),
+                                        //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              final data = {
+                                                "Status":
+                                                    'FINAL FACULTY ACCEPTED'
+                                              };
+                                              _firestore
+                                                  .collection("Event Request")
+                                                  .doc(widget.eventDocumentID)
+                                                  .set(data,
+                                                      SetOptions(merge: true));
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Expanded(
+                                                    child: AlertDialog(
+                                                      title: Text(
+                                                          'Final accept for the event is provided'),
+                                                      //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    10),
+                                                            child: Text(
+                                                              'OK',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(10),
+                                              child: Text(
+                                                'YES',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'YES',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'FINAL ACCEPT',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 40,
+          ),
+        ],
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,92 +492,12 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                         (status == 'ADMIN ACCEPTED' || status == 'COMPLETED')
                             ? true
                             : false,
+                    userType: userType,
                   ),
                   SizedBox(
                     height: 10,
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Card(
-                      color: Color(0xfff7892b),
-                      child: InkWell(
-                        onTap: () {
-                          // Action to perform when the button is pressed
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Expanded(
-                                child: AlertDialog(
-                                  title: Text('Date Time and Venue verified'),
-                                  // content: Text('GeeksforGeeks'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          'OK',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            'VERIFY',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Text(
-                    'Forward To',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    iconEnabledColor: Color(0xfff7892b),
-                    iconSize: 60,
-                    value: _selectedOption,
-                    items: facultyMails
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      // Change function parameter to nullable string
-                      setState(() {
-                        _selectedOption = newValue;
-                      });
-                    },
-                  ),
+                  bottomPart(),
                   SizedBox(
                     height: 25,
                   ),
@@ -218,48 +506,17 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                     child: Card(
                       color: Color(0xfff7892b),
                       child: InkWell(
-                        onTap: () {
-                          // Action to perform when the button is pressed
-                          facultiesInvolved.add(_selectedOption);
-                          final data = {
-                            "FacultIies Involved": facultiesInvolved
-                          };
-                          _firestore
-                              .collection("Event Request")
+                        onTap: () async {
+                          await _firestore
+                              .collection('Event Request')
                               .doc(widget.eventDocumentID)
-                              .set(data, SetOptions(merge: true));
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Expanded(
-                                child: AlertDialog(
-                                  title: Text('Event request forwarded'),
-                                  // content: Text('GeeksforGeeks'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          'OK',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
+                              .delete();
+                          Navigator.pop(context);
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            'FORWARD',
+                            'REJECT',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 20.0,
@@ -269,150 +526,6 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    'OR',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Card(
-                      color: Color(0xfff7892b),
-                      child: InkWell(
-                        onTap: () {
-                          // Action to perform when the button is pressed
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Expanded(
-                                child: AlertDialog(
-                                  title: Text('ATTENTION !!!'),
-                                  content: Text(
-                                      'Are you sure you have the authority to give final accept this event request'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return Expanded(
-                                              child: AlertDialog(
-                                                title: Text(
-                                                    'Do you want to give final accept to this event Request'),
-                                                //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      final data = {
-                                                        "Status":
-                                                            'FINAL FACULTY ACCEPTED'
-                                                      };
-                                                      _firestore
-                                                          .collection(
-                                                              "Event Request")
-                                                          .doc(widget
-                                                              .eventDocumentID)
-                                                          .set(
-                                                              data,
-                                                              SetOptions(
-                                                                  merge: true));
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return Expanded(
-                                                            child: AlertDialog(
-                                                              title: Text(
-                                                                  'Final accept for the event is provided'),
-                                                              //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    padding:
-                                                                        EdgeInsets.all(
-                                                                            10),
-                                                                    child: Text(
-                                                                      'OK',
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.white),
-                                                                    ),
-                                                                    color: Colors
-                                                                        .black,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      );
-                                                    },
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(10),
-                                                      child: Text(
-                                                        'YES',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          'YES',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            'FINAL ACCEPT',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 40,
                   ),
                 ]),
           ),
@@ -432,7 +545,8 @@ class Event_Detail_Column extends StatelessWidget {
       required this.venue,
       required this.description,
       required this.faculties_involved,
-      required this.isCompleted});
+      required this.isCompleted,
+      required this.userType});
 
   final String id,
       date,
@@ -440,7 +554,8 @@ class Event_Detail_Column extends StatelessWidget {
       event_start_time,
       event_end_time,
       venue,
-      description;
+      description,
+      userType;
 
   final List<dynamic> faculties_involved;
   final bool isCompleted;
@@ -497,9 +612,42 @@ class Event_Detail_Column extends StatelessWidget {
           height: 10,
         ),
         Text(
-          'STUDENT : ' + student,
+          'GENERATED USER : ',
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+        ),
+        TextButton(
+          onPressed: () {
+            if (userType == 'FACULTY') {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Faculty_profile(
+                      facultyMail: student,
+                    ),
+                  ));
+            } else if (userType == 'STUDENT') {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Student_Profile(
+                      studentMail: student,
+                    ),
+                  ));
+            } else {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Administrator_profile(adminMail: student)));
+            }
+          },
+          child: Text(
+            student,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontWeight: FontWeight.w800, fontSize: 20, color: Colors.blue),
+          ),
         ),
         SizedBox(
           height: 10,

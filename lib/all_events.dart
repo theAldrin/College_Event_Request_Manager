@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/administrator_event_details.dart';
 import 'package:flutter/material.dart';
 import 'student_faculty_event_details.dart';
 
@@ -99,8 +100,7 @@ class MessageStream extends StatelessWidget {
                 date: event.data()['Date'],
                 student: event.data()['Generated User'],
                 eventstatus: 'ONGOING',
-                nextpage: Student_Faculty_event_details(
-                  //TODO: CUSTOM ADMIN EVENT DETAIL PAGE WITH VARIOUS FUNCTIONALITIES
+                nextpage: Administrator_event_details(
                   status: event.data()['Status'],
                   name: event.data()['Event Name'],
                   id: event.data()['ID'].toString(),
@@ -111,7 +111,8 @@ class MessageStream extends StatelessWidget {
                   venue: event.data()['Venue'],
                   description: event.data()['Event Description'],
                   facultiesInvolved: event.data()['FacultIies Involved'],
-                  userType: 'ADMINISTRATOR',
+                  userType: event.data()['User Type'],
+                  docID: event.id,
                 ),
                 context: context);
             EventRequests.add(eventCard);
