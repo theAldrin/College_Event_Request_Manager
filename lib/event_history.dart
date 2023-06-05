@@ -64,7 +64,7 @@ class _Event_historyState extends State<Event_history> {
               DropdownButton<String>(
                 //isExpanded: true,
                 iconEnabledColor: Color(0xfff7892b),
-                iconSize: 60,
+                iconSize: 30,
                 value: _selectedOption,
                 items: <String>[
                   'ALL',
@@ -150,6 +150,7 @@ class MessageStream extends StatelessWidget {
                     status: event.data()['Status'],
                     userType: event.data()['User Type'],
                     reason: event.data()['Reason For Removal'],
+                    rejectedUser: event.data()['Rejected User'],
                   ),
                   context: context);
               EventRequests.add(eventCard);
@@ -186,12 +187,12 @@ class EventCard extends StatelessWidget {
       return Colors.green;
     } else if (eventstatus == 'ONGOING') {
       return Colors.blue;
-    } else if (eventstatus == 'REJECTED') {
+    } else if (eventstatus == 'REJECTED' || eventstatus == 'WITHDRAWN') {
       return Colors.red;
-    } else if (eventstatus == 'FINAL ACCEPT RECEIVED') {
+    } else if (eventstatus == 'FINAL FACULTY ACCEPTED') {
       return Colors.greenAccent;
     } else {
-      return Colors.black38;
+      return Colors.grey;
     }
   }
 
@@ -203,64 +204,107 @@ class EventCard extends StatelessWidget {
           builder: (context) => nextpage,
         ));
       },
-      child: Card(
-        margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 20,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 13),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: Color(0xFFFAFAFA),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.4,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  eventTitle,
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-                ),
-                SizedBox(
-                  height: 7,
-                ),
-                Text(
-                  'Id : ' + eventId,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-                ),
-                SizedBox(
-                  height: 7,
-                ),
-                Text(
-                  'Date : ' + date,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-                ),
-                SizedBox(
-                  height: 7,
-                ),
-                Text(
-                  'Student : ' + student,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-              ],
-            ),
-            Expanded(child: Container()),
-            Expanded(
-              child: Text(
-                textAlign: TextAlign.center,
-                eventstatus,
-                style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                    color: calStatusColour(eventstatus)),
+            boxShadow: [
+              BoxShadow(
+                  color: Color(0x13000000),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                  offset: Offset(0, 5)),
+            ],
+          ),
+          margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 20,
               ),
-            ),
-            SizedBox(
-              width: 20,
-            )
-          ],
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    eventTitle,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 22,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Text(
+                    'ID   ' + eventId,
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.date_range,
+                        size: 20,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        date,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 17),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.man,
+                        size: 20,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        student,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 17),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    textAlign: TextAlign.center,
+                    eventstatus,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 20,
+                        color: calStatusColour(eventstatus)),
+                  ),
+                  SizedBox(
+                    height: 11,
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

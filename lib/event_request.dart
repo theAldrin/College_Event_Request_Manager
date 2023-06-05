@@ -99,11 +99,11 @@ class _Event_requestState extends State<Event_request> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: 90),
+              SizedBox(height: 40),
               _title(),
               SizedBox(height: 50),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -142,7 +142,6 @@ class _Event_requestState extends State<Event_request> {
                   }, currentTime: DateTime.now(), locale: LocaleType.en);
                 },
                 child: Container(
-                  //margin: EdgeInsets.symmetric(vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -265,98 +264,111 @@ class _Event_requestState extends State<Event_request> {
                   ),
                 ),
               ), //End time Picker
-              SizedBox(height: 10),
-              Text(
-                'Venue',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              DropdownButton<String>(
-                isExpanded: true,
-                iconEnabledColor: Color(0xfff7892b),
-                iconSize: 60,
-                value: venue,
-                items: venuesList.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  // Change function parameter to nullable string
-                  setState(() {
-                    venue = newValue;
-                  });
-                },
-              ), //hallRoom
-              SizedBox(height: 10),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+              SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
+                  children: [
                     Text(
-                      'Event Description',
+                      'Venue',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextFormField(
-                      style: TextStyle(fontSize: 15),
-                      maxLines: 250,
-                      minLines: 1,
-                      onChanged: (value) {
-                        description = value;
+                    SizedBox(height: 8),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      iconEnabledColor: Color(0xfff7892b),
+                      iconSize: 30,
+                      value: venue,
+                      items: venuesList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        // Change function parameter to nullable string
+                        setState(() {
+                          venue = newValue;
+                        });
                       },
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide:
-                              BorderSide(color: Colors.grey, width: 0.5),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide:
-                              BorderSide(color: Colors.grey, width: 0.5),
-                        ),
-                        focusColor: Colors.grey,
-                        contentPadding: EdgeInsets.all(12),
-                        hintStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(width: 0.5)),
+                    ), //hallRoom
+                    SizedBox(height: 10),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Event Description',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          TextFormField(
+                            style: TextStyle(fontSize: 15),
+                            maxLines: 250,
+                            minLines: 1,
+                            onChanged: (value) {
+                              description = value;
+                            },
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 0.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 0.5),
+                              ),
+                              focusColor: Colors.grey,
+                              contentPadding: EdgeInsets.all(12),
+                              hintStyle: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                              ),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 0.5)),
+                            ),
+                          ),
+                        ],
                       ),
+                    ), //Event Description
+                    SizedBox(height: 10),
+                    Text(
+                      'Associated Faculty Email',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    SizedBox(height: 8),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      iconEnabledColor: Color(0xfff7892b),
+                      iconSize: 35,
+                      value: faculty,
+                      items: facultyList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        // Change function parameter to nullable string
+                        setState(() {
+                          faculty = newValue;
+                        });
+                      },
                     ),
                   ],
                 ),
-              ), //Event Description
-              SizedBox(height: 10),
-              Text(
-                'Associated Faculty Email',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              DropdownButton<String>(
-                isExpanded: true,
-                iconEnabledColor: Color(0xfff7892b),
-                iconSize: 60,
-                value: faculty,
-                items:
-                    facultyList.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  // Change function parameter to nullable string
-                  setState(() {
-                    faculty = newValue;
-                  });
-                },
               ), //faculty Mail
               SizedBox(height: 20),
               Row(
@@ -486,7 +498,8 @@ class _Event_requestState extends State<Event_request> {
                                           'TimeStamp':
                                               FieldValue.serverTimestamp(),
                                           'User Type': widget.userType,
-                                          'Reason For Removal': ' '
+                                          'Reason For Removal': ' ',
+                                          'Rejected User': ' '
                                         });
                                         Navigator.pop(context);
                                         showDialog(

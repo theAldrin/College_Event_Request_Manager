@@ -19,7 +19,8 @@ class Administrator_event_details extends StatefulWidget {
       required this.status,
       required this.userType,
       required this.docID,
-      required this.reason});
+      required this.reason,
+      required this.rejectedUser});
   final String id,
       date,
       student,
@@ -31,7 +32,8 @@ class Administrator_event_details extends StatefulWidget {
       status,
       userType,
       docID,
-      reason;
+      reason,
+      rejectedUser;
   final List<dynamic> facultiesInvolved;
 
   @override
@@ -88,6 +90,7 @@ class _Administrator_event_detailsState
                   userType: widget.userType,
                   docID: widget.docID,
                   reason: widget.reason,
+                  rejectedUser: widget.rejectedUser,
                 )
               ]),
         ),
@@ -110,7 +113,8 @@ class Event_Detail_Column extends StatefulWidget {
       required this.status,
       required this.userType,
       required this.docID,
-      required this.reason});
+      required this.reason,
+      required this.rejectedUser});
 
   final String id,
       date,
@@ -122,7 +126,8 @@ class Event_Detail_Column extends StatefulWidget {
       status,
       userType,
       docID,
-      reason;
+      reason,
+      rejectedUser;
 
   final List<dynamic> faculties_involved;
   final bool isCompleted;
@@ -206,10 +211,18 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
                           color: Colors.black,
                         ),
                         child: TextButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              String adminMail = ' ';
+                              final admins = await _firestore
+                                  .collection("Administrator User Details")
+                                  .get();
+                              for (var admin in admins.docs) {
+                                adminMail = admin.data()['Email'];
+                              }
                               final data = {
                                 "Status": 'REJECTED',
-                                "Reason For Removal": newReason
+                                "Reason For Removal": newReason,
+                                "Rejected User": adminMail
                               };
                               _firestore
                                   .collection("Event Request")
@@ -411,11 +424,29 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
   }
 
   Widget reasonText() {
-    if (widget.status == 'WITHDRAWN' || widget.status == 'REJECTED') {
+    if (widget.status == 'WITHDRAWN') {
       return Text(
         'REASON : ' + widget.reason,
         textAlign: TextAlign.center,
         style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+      );
+    } else if (widget.status == 'REJECTED') {
+      return Column(
+        children: [
+          Text(
+            'REJECTED BY : ' + widget.rejectedUser,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'REASON : ' + widget.reason,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+        ],
       );
     } else {
       return Text('');

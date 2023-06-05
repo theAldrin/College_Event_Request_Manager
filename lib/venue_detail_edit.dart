@@ -52,7 +52,7 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
       capacity = '',
       department = 'COMPUTER SCIENCE',
       name = '';
-  List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS'];
+  List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
 
   List<String> departments = [
     'COMPUTER SCIENCE',

@@ -20,7 +20,8 @@ class Student_Faculty_event_details extends StatefulWidget {
       required this.facultiesInvolved,
       required this.status,
       required this.userType,
-      required this.reason});
+      required this.reason,
+      required this.rejectedUser});
   final String id,
       date,
       student,
@@ -31,7 +32,8 @@ class Student_Faculty_event_details extends StatefulWidget {
       name,
       status,
       userType,
-      reason;
+      reason,
+      rejectedUser;
   final List<dynamic> facultiesInvolved;
 
   @override
@@ -108,6 +110,7 @@ class _Student_Faculty_event_detailsState
                       : false,
                   userType: widget.userType,
                   reason: widget.reason,
+                  rejectedUser: widget.rejectedUser,
                 )
               ]),
         ),
@@ -129,7 +132,8 @@ class Event_Detail_Column extends StatefulWidget {
       required this.isCompleted,
       required this.status,
       required this.userType,
-      required this.reason});
+      required this.reason,
+      required this.rejectedUser});
 
   final String id,
       date,
@@ -140,7 +144,8 @@ class Event_Detail_Column extends StatefulWidget {
       description,
       status,
       userType,
-      reason;
+      reason,
+      rejectedUser;
 
   final List<dynamic> faculties_involved;
   final bool isCompleted;
@@ -366,11 +371,29 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
   }
 
   Widget reasonText() {
-    if (widget.status == 'WITHDRAWN' || widget.status == 'REJECTED') {
+    if (widget.status == 'WITHDRAWN') {
       return Text(
         'REASON : ' + widget.reason,
         textAlign: TextAlign.center,
         style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+      );
+    } else if (widget.status == 'REJECTED') {
+      return Column(
+        children: [
+          Text(
+            'REJECTED BY : ' + widget.rejectedUser,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'REASON : ' + widget.reason,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+        ],
       );
     } else {
       return Text('');

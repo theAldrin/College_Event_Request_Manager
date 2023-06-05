@@ -85,23 +85,23 @@ class VenueCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          // border: Border.all(
-          //   color: Colors.grey,
-          //   width: 0,
-          // ),
+          borderRadius: BorderRadius.circular(15),
+          color: Color(0xFFFAFAFA),
+          border: Border.all(
+            color: Colors.grey,
+            width: 0.4,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey,
-              blurRadius: 4.0,
-              spreadRadius: 0,
-            ),
+                color: Color(0x13000000),
+                blurRadius: 5,
+                spreadRadius: 1,
+                offset: Offset(0, 5)),
           ],
         ),
         margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(5, 20, 5, 20),
+          padding: const EdgeInsets.fromLTRB(15, 20, 10, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -148,7 +148,7 @@ class VenueCard extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 7),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            borderRadius: BorderRadius.all(Radius.circular(6)),
                             // boxShadow: <BoxShadow>[
                             //   BoxShadow(
                             //       color: Colors.grey.shade900,
@@ -204,7 +204,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
       newVenueDepartment = 'COMPUTER SCIENCE',
       newVenueCapacity = '';
 
-  List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS'];
+  List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
 
   List<String> departments = [
     'COMPUTER SCIENCE',

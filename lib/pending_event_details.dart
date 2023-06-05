@@ -167,10 +167,6 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                       actions: [
                         TextButton(
                           onPressed: () async {
-                            await _firestore
-                                .collection('Event Request')
-                                .doc(widget.eventDocumentID)
-                                .delete();
                             Navigator.pop(context);
                           },
                           child: Container(
@@ -344,99 +340,88 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return Expanded(
-                        child: AlertDialog(
-                          title: Text('ATTENTION !!!'),
-                          content: Text(
-                              'Are you sure you have the authority to give final accept this event request'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Expanded(
-                                      child: AlertDialog(
-                                        title: Text(
-                                            'Do you want to give final accept to this event Request'),
-                                        //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              final data = {
-                                                "Status":
-                                                    'FINAL FACULTY ACCEPTED'
-                                              };
-                                              _firestore
-                                                  .collection("Event Request")
-                                                  .doc(widget.eventDocumentID)
-                                                  .set(data,
-                                                      SetOptions(merge: true));
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return Expanded(
-                                                    child: AlertDialog(
-                                                      title: Text(
-                                                          'Final accept for the event is provided'),
-                                                      //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Container(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    10),
-                                                            child: Text(
-                                                              'OK',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                            color: Colors.black,
-                                                          ),
-                                                        ),
-                                                      ],
+                      return AlertDialog(
+                        title: Text('ATTENTION !!!'),
+                        content: Text(
+                            'Are you sure you have the authority to give final accept this event request'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(
+                                        'Do you want to give final accept to this event Request'),
+                                    //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () async {
+                                          final data = {
+                                            "Status": 'FINAL FACULTY ACCEPTED',
+                                          };
+                                          _firestore
+                                              .collection("Event Request")
+                                              .doc(widget.eventDocumentID)
+                                              .set(data,
+                                                  SetOptions(merge: true));
+                                          Navigator.pop(context);
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Final accept for the event is provided'),
+                                                //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(10),
+                                                      child: Text(
+                                                        'OK',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      color: Colors.black,
                                                     ),
-                                                  );
-                                                },
+                                                  ),
+                                                ],
                                               );
                                             },
-                                            child: Container(
-                                              padding: EdgeInsets.all(10),
-                                              child: Text(
-                                                'YES',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              color: Colors.black,
-                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(10),
+                                          child: Text(
+                                            'YES',
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
-                                        ],
+                                          color: Colors.black,
+                                        ),
                                       ),
-                                    );
-                                  },
-                                );
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  'YES',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                color: Colors.black,
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                'YES',
+                                style: TextStyle(color: Colors.white),
                               ),
+                              color: Colors.black,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       );
                     },
                   );
@@ -462,6 +447,8 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
       );
     }
   }
+
+  String newReason = '';
 
   @override
   Widget build(BuildContext context) {
@@ -507,11 +494,109 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                       color: Color(0xfff7892b),
                       child: InkWell(
                         onTap: () async {
-                          await _firestore
-                              .collection('Event Request')
-                              .doc(widget.eventDocumentID)
-                              .delete();
-                          Navigator.pop(context);
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (context) => SingleChildScrollView(
+                                child: Container(
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom +
+                                          30),
+                              child: Container(
+                                color: Color(0xFF757575),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(30),
+                                          topLeft: Radius.circular(30))),
+                                  padding: EdgeInsets.fromLTRB(40, 30, 40, 0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Reason',
+                                        style: TextStyle(
+                                            color: Color(0xffe46b10),
+                                            fontSize: 35,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      TextFormField(
+                                        autofocus: true,
+                                        style: TextStyle(fontSize: 15),
+                                        maxLines: 250,
+                                        minLines: 1,
+                                        onChanged: (value) {
+                                          newReason = value;
+                                        },
+                                        decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            borderSide: BorderSide(
+                                                color: Colors.grey, width: 0.5),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            borderSide: BorderSide(
+                                                color: Colors.grey, width: 0.5),
+                                          ),
+                                          focusColor: Colors.grey,
+                                          contentPadding: EdgeInsets.all(12),
+                                          hintStyle: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300,
+                                          ),
+                                          border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide:
+                                                  const BorderSide(width: 0.5)),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(7),
+                                          color: Colors.black,
+                                        ),
+                                        child: TextButton(
+                                            onPressed: () {
+                                              final data = {
+                                                "Status": 'REJECTED',
+                                                "Reason For Removal": newReason,
+                                                "Rejected User":
+                                                    loggedInUser.email
+                                              };
+                                              _firestore
+                                                  .collection("Event Request")
+                                                  .doc(widget.eventDocumentID)
+                                                  .set(data,
+                                                      SetOptions(merge: true));
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              'CONFIRM',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )),
+                          );
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
