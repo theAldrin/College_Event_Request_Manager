@@ -675,115 +675,136 @@ class Event_Detail_Column extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 20,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Color(0xFFFAFAFA),
+        border: Border.all(
+          color: Colors.grey,
+          width: 0.4,
         ),
-        Text(
-          'ID : ' + id,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'DATE : ' + date,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'GENERATED USER : ',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        TextButton(
-          onPressed: () {
-            if (userType == 'FACULTY') {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Faculty_profile(
-                      facultyMail: student,
-                    ),
-                  ));
-            } else if (userType == 'STUDENT') {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Student_Profile(
-                      studentMail: student,
-                    ),
-                  ));
-            } else {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Administrator_profile(adminMail: student)));
-            }
-          },
-          child: Text(
-            student,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontWeight: FontWeight.w800, fontSize: 20, color: Colors.blue),
+        boxShadow: [
+          BoxShadow(
+              color: Color(0x13000000),
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: Offset(0, 0)),
+        ],
+      ),
+      margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 20,
           ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'EVENT START TIME : ' + event_start_time,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'EVENT END TIME : ' + event_end_time,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'VENUE : ' + venue,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        Text(
-          'DESCRIPTION : ' + description,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        Text(
-          'FACULTIES ALREADY APPROVED:',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Column(
-          children: facultylist(context),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-      ],
+          Text(
+            'ID : ' + id,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'DATE : ' + date,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'GENERATED USER : ',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          TextButton(
+            onPressed: () {
+              if (userType == 'FACULTY') {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Faculty_profile(
+                        facultyMail: student,
+                      ),
+                    ));
+              } else if (userType == 'STUDENT') {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Student_Profile(
+                        studentMail: student,
+                      ),
+                    ));
+              } else {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Administrator_profile(adminMail: student)));
+              }
+            },
+            child: Text(
+              student,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                  color: Colors.blue),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'EVENT START TIME : ' + event_start_time,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'EVENT END TIME : ' + event_end_time,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'VENUE : ' + venue,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            'DESCRIPTION : ' + description,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            'FACULTIES ALREADY APPROVED:',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Column(
+            children: facultylist(context),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
     );
   }
 }

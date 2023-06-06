@@ -402,133 +402,154 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 20,
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Color(0xFFFAFAFA),
+        border: Border.all(
+          color: Colors.grey,
+          width: 0.4,
         ),
-        Text(
-          'ID : ' + widget.id,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'DATE : ' + widget.date,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'GENERATED USER : ',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        TextButton(
-          onPressed: () {
-            print(widget.userType);
-            if (widget.userType == 'FACULTY') {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Faculty_profile(
-                      facultyMail: widget.student,
-                    ),
-                  ));
-            } else if (widget.userType == 'STUDENT') {
-              print('student');
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Student_Profile(
-                      studentMail: widget.student,
-                    ),
-                  ));
-            } else {
-              print('admin');
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Administrator_profile(adminMail: widget.student)));
-            }
-          },
-          child: Text(
-            widget.student,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontWeight: FontWeight.w800, fontSize: 20, color: Colors.blue),
+        boxShadow: [
+          BoxShadow(
+              color: Color(0x13000000),
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: Offset(0, 0)),
+        ],
+      ),
+      margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 20,
           ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'EVENT START TIME : ' + widget.event_start_time,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'EVENT END TIME : ' + widget.event_end_time,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          'VENUE : ' + widget.venue,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        Text(
-          'DESCRIPTION : ' + widget.description,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        Text(
-          'STATUS : ' + widget.status,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        reasonText(),
-        SizedBox(
-          height: 30,
-        ),
-        Text(
-          'FACULTIES INVOLVED:',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Column(
-          children: facultylist(
-              context), //returns text widgets of all the faculties involved except the last
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        bottompart(
-            context) //returns the last faculty current faculty/final accept giving faculty
-      ],
+          Text(
+            'ID : ' + widget.id,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'DATE : ' + widget.date,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'GENERATED USER : ',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          TextButton(
+            onPressed: () {
+              print(widget.userType);
+              if (widget.userType == 'FACULTY') {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Faculty_profile(
+                        facultyMail: widget.student,
+                      ),
+                    ));
+              } else if (widget.userType == 'STUDENT') {
+                print('student');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Student_Profile(
+                        studentMail: widget.student,
+                      ),
+                    ));
+              } else {
+                print('admin');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Administrator_profile(adminMail: widget.student)));
+              }
+            },
+            child: Text(
+              widget.student,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                  color: Colors.blue),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'EVENT START TIME : ' + widget.event_start_time,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'EVENT END TIME : ' + widget.event_end_time,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            'VENUE : ' + widget.venue,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            'DESCRIPTION : ' + widget.description,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            'STATUS : ' + widget.status,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          reasonText(),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
+            'FACULTIES INVOLVED:',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Column(
+            children: facultylist(
+                context), //returns text widgets of all the faculties involved except the last
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          bottompart(
+              context) //returns the last faculty current faculty/final accept giving faculty
+        ],
+      ),
     );
   }
 }
