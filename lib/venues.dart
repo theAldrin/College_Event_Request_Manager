@@ -29,7 +29,9 @@ class _VenuesState extends State<Venues> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
         floatingActionButton: FloatingActionButton(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
           backgroundColor: Color(0xffe46b10),
           child: Icon(
             Icons.add,

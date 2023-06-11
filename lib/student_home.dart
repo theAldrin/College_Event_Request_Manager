@@ -8,21 +8,6 @@ import 'calendar.dart';
 import 'event_history.dart';
 import 'event_request.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      home: Student_home(),
-    );
-  }
-}
-
 class Student_home extends StatefulWidget {
   const Student_home({Key? key}) : super(key: key);
 
