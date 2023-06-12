@@ -46,7 +46,8 @@ class _Event_historyState extends State<Event_history> {
     );
   }
 
-  String? _selectedOption = 'ALL';
+  String? _selectedStatus = 'ALL', _selectedUserType = 'ALL';
+  late String _searchText = '';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -61,35 +62,158 @@ class _Event_historyState extends State<Event_history> {
                 child: _title(),
                 width: double.infinity,
               ),
-              DropdownButton<String>(
-                //isExpanded: true,
-                iconEnabledColor: Color(0xfff7892b),
-                iconSize: 30,
-                value: _selectedOption,
-                items: <String>[
-                  'ALL',
-                  'ADMIN ACCEPTED',
-                  'ONGOING',
-                  'REJECTED',
-                  'FINAL FACULTY ACCEPTED',
-                  'COMPLETED'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  // Change function parameter to nullable string
-                  setState(() {
-                    _selectedOption = newValue;
-                  });
-                },
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                child: SizedBox(
+                  height: 40,
+                  child: TextFormField(
+                    // style: ,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchText = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                        focusColor: Colors.grey,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: "Search",
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: const BorderSide(width: 4)),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          size: 15,
+                        )),
+                  ),
+                ),
               ),
-              //
+              SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                        child: Text(
+                          'STATUS',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.9,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 0),
+                          child: DropdownButton<String>(
+                            //isExpanded: true,
+                            iconEnabledColor: Color(0xfff7892b),
+                            iconSize: 25,
+                            underline: SizedBox(),
+                            value: _selectedStatus,
+                            items: <String>[
+                              'ALL',
+                              'ADMIN ACCEPTED',
+                              'ONGOING',
+                              'REJECTED',
+                              'FINAL FACULTY ACCEPTED',
+                              'COMPLETED'
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              // Change function parameter to nullable string
+                              setState(() {
+                                _selectedStatus = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                        child: Text(
+                          'USER',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.9,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          child: DropdownButton<String>(
+                            //isExpanded: true,
+                            iconEnabledColor: Color(0xfff7892b),
+                            iconSize: 25,
+                            underline: SizedBox(),
+                            value: _selectedUserType,
+                            items: <String>[
+                              'ALL',
+                              'MY EVENTS',
+                              'OTHERS EVENTS',
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              // Change function parameter to nullable string
+                              setState(() {
+                                _selectedUserType = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
               MessageStream(
                 userType: widget.userType,
-              )
+                searchText: _searchText,
+              ),
             ],
           ),
         ),
@@ -99,8 +223,9 @@ class _Event_historyState extends State<Event_history> {
 }
 
 class MessageStream extends StatelessWidget {
-  MessageStream({required this.userType});
+  MessageStream({required this.userType, required this.searchText});
   String userType;
+  final String searchText;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -118,42 +243,50 @@ class MessageStream extends StatelessWidget {
           for (var event in events!) {
             // final messageText = message.data()['text'];
             // final messageSender = message.data()['sender'];
-            bool flag = false;
-            for (String facultyMails in event.data()['FacultIies Involved']) {
-              if ((loggedInUser.email == facultyMails) &&
-                  (event.data()['FacultIies Involved'].last != facultyMails)) {
-                flag = true;
+            if (event
+                .data()['Event Name']
+                .toLowerCase()
+                .contains(searchText.toLowerCase())) {
+              bool flag = false;
+              for (String facultyMails in event.data()['FacultIies Involved']) {
+                if ((loggedInUser.email == facultyMails) &&
+                    (event.data()['FacultIies Involved'].last !=
+                        facultyMails)) {
+                  flag = true;
+                }
+                if ((event.data()['Status'] != 'ONGOING') &&
+                    (event.data()['FacultIies Involved'].last ==
+                        facultyMails) &&
+                    (loggedInUser.email == facultyMails)) {
+                  flag = true;
+                }
               }
-              if ((event.data()['Status'] != 'ONGOING') &&
-                  (event.data()['FacultIies Involved'].last == facultyMails) &&
-                  (loggedInUser.email == facultyMails)) {
-                flag = true;
-              }
-            }
-            if (loggedInUser.email == event.data()['Generated User'] || flag) {
-              final eventCard = EventCard(
-                  eventTitle: event.data()['Event Name'],
-                  eventId: event.data()['ID'].toString(),
-                  date: event.data()['Date'],
-                  student: event.data()['Generated User'],
-                  eventstatus: event.data()['Status'],
-                  nextpage: Student_Faculty_event_details(
-                    name: event.data()['Event Name'],
-                    id: event.data()['ID'].toString(),
+              if (loggedInUser.email == event.data()['Generated User'] ||
+                  flag) {
+                final eventCard = EventCard(
+                    eventTitle: event.data()['Event Name'],
+                    eventId: event.data()['ID'].toString(),
                     date: event.data()['Date'],
                     student: event.data()['Generated User'],
-                    eventStartTime: event.data()['Event Start Time'],
-                    eventEndTime: event.data()['Event End Time'],
-                    venue: event.data()['Venue'],
-                    description: event.data()['Event Description'],
-                    facultiesInvolved: event.data()['FacultIies Involved'],
-                    status: event.data()['Status'],
-                    userType: event.data()['User Type'],
-                    reason: event.data()['Reason For Removal'],
-                    rejectedUser: event.data()['Rejected User'],
-                  ),
-                  context: context);
-              EventRequests.add(eventCard);
+                    eventstatus: event.data()['Status'],
+                    nextpage: Student_Faculty_event_details(
+                      name: event.data()['Event Name'],
+                      id: event.data()['ID'].toString(),
+                      date: event.data()['Date'],
+                      student: event.data()['Generated User'],
+                      eventStartTime: event.data()['Event Start Time'],
+                      eventEndTime: event.data()['Event End Time'],
+                      venue: event.data()['Venue'],
+                      description: event.data()['Event Description'],
+                      facultiesInvolved: event.data()['FacultIies Involved'],
+                      status: event.data()['Status'],
+                      userType: event.data()['User Type'],
+                      reason: event.data()['Reason For Removal'],
+                      rejectedUser: event.data()['Rejected User'],
+                    ),
+                    context: context);
+                EventRequests.add(eventCard);
+              }
             }
           }
           return Expanded(
