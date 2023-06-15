@@ -1,27 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class Venue_detail_edit extends StatefulWidget {
-  Venue_detail_edit({required this.venueDocumentID});
+class Department_detail_edit extends StatefulWidget {
+  Department_detail_edit({required this.departmentDocumentID});
 
-  final String venueDocumentID;
+  final String departmentDocumentID;
 
   @override
-  State<Venue_detail_edit> createState() => _Venue_detail_editState();
+  State<Department_detail_edit> createState() => _Department_detail_editState();
 }
 
 final _firestore = FirebaseFirestore.instance;
 
-class _Venue_detail_editState extends State<Venue_detail_edit> {
+class _Department_detail_editState extends State<Department_detail_edit> {
   void getData() async {
-    var event =
-        await _firestore.collection("Venues").doc(widget.venueDocumentID).get();
+    var event = await _firestore
+        .collection("Departments")
+        .doc(widget.departmentDocumentID)
+        .get();
     setState(() {
       name = event.data()?['Name'];
-      type = event.data()?['Type'];
-      department = event.data()?['Department'];
-      capacity = event.data()?['Capacity'];
-      faculty = event.data()?['Faculty'];
+      hod = event.data()?['HOD'];
     });
   }
 
@@ -63,21 +62,7 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
   }
 
   //String? _selectedOption = 'STUDENT';
-  late String type = 'CLASS',
-      capacity = '',
-      department = 'COMPUTER SCIENCE',
-      name = '',
-      faculty = 'ADMINISTRATOR';
-  List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
-
-  List<String> departments = [
-    'COMPUTER SCIENCE',
-    'MECHANICAL',
-    'CHEMICAL',
-    'ELECTRICAL AND ELECTRONICAL',
-    'ELECTRONICS AND COMMUNICATION',
-    'CIVIL'
-  ];
+  late String name = '', hod = 'ADMINISTRATOR';
 
   @override
   Widget build(BuildContext context) {
@@ -105,58 +90,7 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
                     isExpanded: true,
                     iconEnabledColor: Color(0xfff7892b),
                     iconSize: 60,
-                    value: type,
-                    items: venueTypes
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      // Change function parameter to nullable string
-                      setState(() {
-                        type = newValue!;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Department',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    iconEnabledColor: Color(0xfff7892b),
-                    iconSize: 60,
-                    value: department,
-                    items: departments
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      // Change function parameter to nullable string
-                      setState(() {
-                        department = newValue!;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 25),
-                  Text(
-                    'Handling Faculty',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    iconEnabledColor: Color(0xfff7892b),
-                    iconSize: 60,
-                    value: faculty,
+                    value: hod,
                     items: facultyList
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
@@ -167,35 +101,9 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
                     onChanged: (String? newValue) {
                       // Change function parameter to nullable string
                       setState(() {
-                        faculty = newValue!;
+                        hod = newValue!;
                       });
                     },
-                  ),
-                  SizedBox(height: 25),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Capacity',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        TextField(
-                            onChanged: (value) {
-                              capacity = value;
-                            },
-                            decoration: InputDecoration(
-                                hintText: capacity,
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
-                      ],
-                    ),
                   ),
                   SizedBox(height: 10),
                   Row(
@@ -204,21 +112,18 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
                       GestureDetector(
                         onTap: () async {
                           await _firestore
-                              .collection('Venues')
-                              .doc(widget.venueDocumentID)
+                              .collection('Departments')
+                              .doc(widget.departmentDocumentID)
                               .update({
-                            'Department': department,
-                            'Type': type,
-                            'Capacity': capacity,
-                            'Faculty': faculty
+                            'HOD': hod,
                           });
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return Expanded(
                                 child: AlertDialog(
-                                  title:
-                                      Text('Venue details updated Succesfully'),
+                                  title: Text(
+                                      'Department details updated Succesfully'),
                                   // content: Text('GeeksforGeeks'),
                                   actions: [
                                     TextButton(
@@ -269,16 +174,16 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
                       GestureDetector(
                         onTap: () async {
                           await _firestore
-                              .collection('Venues')
-                              .doc(widget.venueDocumentID)
+                              .collection('Departments')
+                              .doc(widget.departmentDocumentID)
                               .delete();
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
                               return Expanded(
                                 child: AlertDialog(
-                                  title:
-                                      Text('Venue details Deleted Succesfully'),
+                                  title: Text(
+                                      'Department details Deleted Succesfully'),
                                   // content: Text('GeeksforGeeks'),
                                   actions: [
                                     TextButton(

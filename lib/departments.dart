@@ -2,21 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/venue_detail_edit.dart';
 import 'package:flutter/material.dart';
 
-class Venues extends StatefulWidget {
-  const Venues({Key? key}) : super(key: key);
+import 'department_detail_edit.dart';
+
+class Department extends StatefulWidget {
+  const Department({Key? key}) : super(key: key);
 
   @override
-  State<Venues> createState() => _VenuesState();
+  State<Department> createState() => _DepartmentState();
 }
 
 final _firestore = FirebaseFirestore.instance;
 
-class _VenuesState extends State<Venues> {
+class _DepartmentState extends State<Department> {
   Widget _title() {
     return RichText(
       textAlign: TextAlign.left,
       text: TextSpan(
-        text: 'Venues',
+        text: 'Departments',
         style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w700,
@@ -131,16 +133,13 @@ class _VenuesState extends State<Venues> {
   }
 }
 
-class VenueCard extends StatelessWidget {
-  VenueCard(
-      {required this.venueName,
-      required this.type,
-      required this.capacity,
-      required this.department,
-      required this.venueDocumentID,
-      required this.faculty});
-  String venueName, department, capacity, venueDocumentID, faculty;
-  String type;
+class DepartmentCard extends StatelessWidget {
+  DepartmentCard(
+      {required this.departmentName,
+      required this.hod,
+      required this.departmentDocumentID});
+  String departmentName;
+  String hod, departmentDocumentID;
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +178,7 @@ class VenueCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        venueName,
+                        departmentName,
                         style: TextStyle(
                             fontWeight: FontWeight.w900, fontSize: 20),
                       ),
@@ -187,7 +186,7 @@ class VenueCard extends StatelessWidget {
                         height: 10,
                       ),
                       Text(
-                        type,
+                        'Capacity: ' + hod.toString(),
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 17),
                       ),
@@ -200,8 +199,8 @@ class VenueCard extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Venue_detail_edit(
-                                venueDocumentID: venueDocumentID,
+                              builder: (context) => Department_detail_edit(
+                                departmentDocumentID: departmentDocumentID,
                               ),
                             ));
                       },
@@ -229,31 +228,6 @@ class VenueCard extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                'Capacity: ' + capacity.toString(),
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                'Faculty: ' + faculty,
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                'Department: ' + department,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-              ),
-              // SizedBox(
-              //   height: 7,
-              // ),
             ],
           ),
         ),
@@ -268,23 +242,7 @@ class AddVenueScreen extends StatefulWidget {
 }
 
 class _AddVenueScreenState extends State<AddVenueScreen> {
-  late String newVenueName = '',
-      newVenueType = 'CLASS',
-      newVenueDepartment = 'NONE',
-      newVenueCapacity = '',
-      newVenueFaculty = 'ADMINISTRATOR';
-
-  List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
-
-  List<String> departments = [
-    'NONE',
-    'COMPUTER SCIENCE',
-    'MECHANICAL',
-    'CHEMICAL',
-    'ELECTRICAL AND ELECTRONICAL',
-    'ELECTRONICS AND COMMUNICATION',
-    'CIVIL'
-  ];
+  late String departmentName, hod = 'ADMINISTRATOR';
 
   List<String> facultyList = ['ADMINISTRATOR'];
   void getallFaculties() async {
@@ -318,7 +276,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Add Venue',
+              'Add Deaprtment',
               style: TextStyle(color: Color(0xffe46b10), fontSize: 35),
             ),
             SizedBox(
@@ -333,7 +291,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
             ),
             TextField(
                 onChanged: (value) {
-                  newVenueName = value;
+                  departmentName = value;
                 },
                 decoration: InputDecoration(
                     border: InputBorder.none,
@@ -343,7 +301,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
               height: 20,
             ),
             Text(
-              'Type',
+              'HOD',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             SizedBox(
@@ -353,63 +311,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
               isExpanded: true,
               iconEnabledColor: Color(0xfff7892b),
               iconSize: 60,
-              value: newVenueType,
-              items: venueTypes.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                // Change function parameter to nullable string
-                setState(() {
-                  newVenueType = newValue!;
-                });
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Department',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            DropdownButton<String>(
-              isExpanded: true,
-              iconEnabledColor: Color(0xfff7892b),
-              iconSize: 60,
-              value: newVenueDepartment,
-              items: departments.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                // Change function parameter to nullable string
-                setState(() {
-                  newVenueDepartment = newValue!;
-                });
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Handling Faculty',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            DropdownButton<String>(
-              isExpanded: true,
-              iconEnabledColor: Color(0xfff7892b),
-              iconSize: 60,
-              value: newVenueFaculty,
+              value: hod,
               items: facultyList.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -419,46 +321,25 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
               onChanged: (String? newValue) {
                 // Change function parameter to nullable string
                 setState(() {
-                  newVenueFaculty = newValue!;
+                  hod = newValue!;
                 });
               },
             ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Capacity',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextField(
-                onChanged: (value) {
-                  newVenueCapacity = value;
-                },
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    fillColor: Color(0xfff3f3f4),
-                    filled: true)),
             SizedBox(
               height: 30,
             ),
             GestureDetector(
               onTap: () async {
-                await _firestore.collection('Venues').add({
-                  'Name': newVenueName,
-                  'Type': newVenueType,
-                  'Department': newVenueDepartment,
-                  'Capacity': newVenueCapacity,
-                  'Faculty': newVenueFaculty
+                await _firestore.collection('Departments').add({
+                  'Name': departmentName,
+                  'HOD': hod,
                 });
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return Expanded(
                       child: AlertDialog(
-                        title: Text('Venue Added Succesfully'),
+                        title: Text('Department Added Succesfully'),
                         // content: Text('GeeksforGeeks'),
                         actions: [
                           TextButton(
@@ -506,7 +387,7 @@ class MessageStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: _firestore.collection('Venues').snapshots(),
+        stream: _firestore.collection('Departments').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(
@@ -515,43 +396,28 @@ class MessageStream extends StatelessWidget {
               ),
             );
           }
-          final venues = snapshot.data?.docs.reversed;
-          List<VenueCard> VenueList = [];
-          for (var venue in venues!) {
-            if (venue
+          final departments = snapshot.data?.docs.reversed;
+          List<DepartmentCard> DepartmentList = [];
+          for (var department in departments!) {
+            if (department
                     .data()['Name']
                     .toLowerCase()
                     .contains(searchText.toLowerCase()) ||
-                venue
-                    .data()['Type']
-                    .toLowerCase()
-                    .contains(searchText.toLowerCase()) ||
-                venue
-                    .data()['Capacity']
-                    .toLowerCase()
-                    .contains(searchText.toLowerCase()) ||
-                venue
-                    .data()['Department']
-                    .toLowerCase()
-                    .contains(searchText.toLowerCase()) ||
-                venue
-                    .data()['Faculty']
+                department
+                    .data()['HOD']
                     .toLowerCase()
                     .contains(searchText.toLowerCase())) {
-              VenueList.add(VenueCard(
-                venueName: venue.data()['Name'],
-                type: venue.data()['Type'],
-                capacity: venue.data()['Capacity'],
-                department: venue.data()['Department'],
-                venueDocumentID: venue.id,
-                faculty: venue.data()['Faculty'],
+              DepartmentList.add(DepartmentCard(
+                departmentName: department.data()['Name'],
+                hod: department.data()['HOD'],
+                departmentDocumentID: department.id,
               ));
             }
           }
           return Expanded(
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10),
-              children: VenueList,
+              children: DepartmentList,
             ),
           );
         });

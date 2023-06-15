@@ -41,7 +41,9 @@ class _Event_requestState extends State<Event_request> {
   void getAllVenues() async {
     await for (var snapshot in _firestore.collection('Venues').snapshots()) {
       for (var venue1 in snapshot.docs) {
-        venuesList.add(venue1.data()['Name']);
+        setState(() {
+          venuesList.add(venue1.data()['Name']);
+        });
       }
     }
   }
@@ -52,7 +54,9 @@ class _Event_requestState extends State<Event_request> {
     final faculties = facultyData.docs;
     for (var faculty1 in faculties) {
       if ((faculty1.data()['Email'] != loggedInUser.email)) {
-        facultyList.add(faculty1.data()['Email']);
+        setState(() {
+          facultyList.add(faculty1.data()['Email']);
+        });
       }
     }
   }
@@ -63,10 +67,6 @@ class _Event_requestState extends State<Event_request> {
     getCurrentUser();
     getAllVenues();
     getallFaculties();
-    // print(facultyList);
-    // print(venuesList);
-    // venue = venuesList.first;
-    // faculty = facultyList.first;
   }
 
   Widget _title() {
