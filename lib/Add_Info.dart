@@ -2,6 +2,8 @@ import 'package:event_consent2/departments.dart';
 import 'package:event_consent2/venues.dart';
 import 'package:flutter/material.dart';
 
+import 'package:event_consent2/clubs.dart';
+
 class Add_Info extends StatefulWidget {
   const Add_Info({Key? key}) : super(key: key);
 
@@ -51,6 +53,10 @@ class _Add_InfoState extends State<Add_Info> {
                     InfoCard(
                       infoType: 'Departments',
                       onPressed: Department(),
+                    ),
+                    InfoCard(
+                      infoType: 'Clubs',
+                      onPressed: Clubs(),
                     ),
                   ],
                 ),
