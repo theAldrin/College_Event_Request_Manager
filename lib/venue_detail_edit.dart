@@ -21,11 +21,13 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
       type = event.data()?['Type'];
       department = event.data()?['Department'];
       capacity = event.data()?['Capacity'];
-      faculty = event.data()?['Faculty'];
+      facultyName = event.data()?['Faculty Name'];
+      facultyEmail = event.data()?['Faculty Email'];
     });
   }
 
-  List<String> facultyList = ['ADMINISTRATOR'];
+  List<String> facultyNameList = ['NONE'];
+  List<String> facultyEmailList = ['NONE'];
 
   void getallFaculties() async {
     final facultyData =
@@ -33,15 +35,50 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
     final faculties = facultyData.docs;
     for (var faculty1 in faculties) {
       setState(() {
-        facultyList.add(faculty1.data()['Name']);
+        facultyEmailList.add(faculty1.data()['Email']);
+        facultyNameList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  Widget facultyNameFromMailWidget(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return Text(facultyNameList[i]);
+      }
+    }
+    return Text('');
+  }
+
+  String facultyNameFromMailString(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return facultyNameList[i];
+      }
+    }
+    return ' ';
+  }
+
+  void getAdmin() async {
+    final adminData =
+        await _firestore.collection('Administrator User Details').get();
+    final admins = adminData.docs;
+    for (var admin1 in admins) {
+      setState(() {
+        facultyEmailList.add(admin1.data()['Email']);
+        facultyNameList.add('ADMINISTRATOR');
       });
     }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    getAdmin();
     getallFaculties();
     getData();
   }
@@ -67,10 +104,12 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
       capacity = '',
       department = 'COMPUTER SCIENCE',
       name = '',
-      faculty = 'ADMINISTRATOR';
+      facultyName = 'NONE',
+      facultyEmail = 'NONE';
   List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
 
   List<String> departments = [
+    'NONE',
     'COMPUTER SCIENCE',
     'MECHANICAL',
     'CHEMICAL',
@@ -156,18 +195,19 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
                     isExpanded: true,
                     iconEnabledColor: Color(0xfff7892b),
                     iconSize: 60,
-                    value: faculty,
-                    items: facultyList
+                    value: facultyEmail,
+                    items: facultyEmailList
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value),
+                        child: facultyNameFromMailWidget(value),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
                       // Change function parameter to nullable string
                       setState(() {
-                        faculty = newValue!;
+                        facultyEmail = newValue!;
+                        facultyName = facultyNameFromMailString(facultyEmail);
                       });
                     },
                   ),
@@ -210,7 +250,8 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
                             'Department': department,
                             'Type': type,
                             'Capacity': capacity,
-                            'Faculty': faculty
+                            'Faculty Name': facultyName,
+                            'Faculty Email': facultyEmail
                           });
                           showDialog(
                             context: context,

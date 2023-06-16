@@ -136,10 +136,11 @@ class _DepartmentState extends State<Department> {
 class DepartmentCard extends StatelessWidget {
   DepartmentCard(
       {required this.departmentName,
-      required this.hod,
-      required this.departmentDocumentID});
+      required this.hodName,
+      required this.departmentDocumentID,
+      required this.hodEmail});
   String departmentName;
-  String hod, departmentDocumentID;
+  String hodName, hodEmail, departmentDocumentID;
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +185,29 @@ class DepartmentCard extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      'HOD: ' + hod.toString(),
+                      'HOD ',
                       style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+                          TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Name: ' + hodName.toString(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.black54),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Email: ' + hodEmail.toString(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          color: Colors.black54),
                     ),
                   ],
                 ),
@@ -242,9 +263,10 @@ class AddDepartmentScreen extends StatefulWidget {
 }
 
 class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
-  late String departmentName, hod = 'ADMINISTRATOR';
+  late String clubName, HODMail = 'NONE', HODName = 'NONE';
 
-  List<String> facultyList = ['ADMINISTRATOR'];
+  List<String> facultyNameList = ['NONE'];
+  List<String> facultyEmailList = ['NONE'];
 
   void getallFaculties() async {
     final facultyData =
@@ -252,7 +274,8 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
     final faculties = facultyData.docs;
     for (var faculty1 in faculties) {
       setState(() {
-        facultyList.add(faculty1.data()['Name']);
+        facultyEmailList.add(faculty1.data()['Email']);
+        facultyNameList.add(faculty1.data()['Name']);
       });
     }
   }
@@ -261,6 +284,28 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
   void initState() {
     super.initState();
     getallFaculties();
+  }
+
+  Widget facultyNameFromMailWidget(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return Text(facultyNameList[i]);
+      }
+    }
+    return Text('');
+  }
+
+  String facultyNameFromMailString(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return facultyNameList[i];
+      }
+    }
+    return ' ';
   }
 
   @override
@@ -278,7 +323,7 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Add Deaprtment',
+                'Add Department',
                 style: TextStyle(color: Color(0xffe46b10), fontSize: 35),
               ),
               SizedBox(
@@ -293,7 +338,7 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
               ),
               TextField(
                   onChanged: (value) {
-                    departmentName = value;
+                    clubName = value;
                   },
                   decoration: InputDecoration(
                       border: InputBorder.none,
@@ -313,18 +358,20 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
                 isExpanded: true,
                 iconEnabledColor: Color(0xfff7892b),
                 iconSize: 60,
-                value: hod,
-                items:
-                    facultyList.map<DropdownMenuItem<String>>((String value) {
+                value: HODMail,
+                items: facultyEmailList
+                    .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: facultyNameFromMailWidget(
+                        value), //Find faculty based on email here
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
                   // Change function parameter to nullable string
                   setState(() {
-                    hod = newValue!;
+                    HODMail = newValue!;
+                    HODName = facultyNameFromMailString(HODMail);
                   });
                 },
               ),
@@ -334,8 +381,9 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
               GestureDetector(
                 onTap: () async {
                   await _firestore.collection('Departments').add({
-                    'Name': departmentName,
-                    'HOD': hod,
+                    'Name': clubName,
+                    'HOD Email': HODMail,
+                    'HOD Name': HODName,
                   });
                   showDialog(
                     context: context,
@@ -407,13 +455,18 @@ class MessageStream extends StatelessWidget {
                     .toLowerCase()
                     .contains(searchText.toLowerCase()) ||
                 department
-                    .data()['HOD']
+                    .data()['HOD Name']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                department
+                    .data()['HOD Email']
                     .toLowerCase()
                     .contains(searchText.toLowerCase())) {
               DepartmentList.add(DepartmentCard(
                 departmentName: department.data()['Name'],
-                hod: department.data()['HOD'],
                 departmentDocumentID: department.id,
+                hodName: department.data()['HOD Name'],
+                hodEmail: department.data()['HOD Email'],
               ));
             }
           }

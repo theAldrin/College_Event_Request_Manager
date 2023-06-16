@@ -138,8 +138,14 @@ class VenueCard extends StatelessWidget {
       required this.capacity,
       required this.department,
       required this.venueDocumentID,
-      required this.faculty});
-  String venueName, department, capacity, venueDocumentID, faculty;
+      required this.facultyName,
+      required this.facultyMail});
+  String venueName,
+      department,
+      capacity,
+      venueDocumentID,
+      facultyName,
+      facultyMail;
   String type;
 
   @override
@@ -240,16 +246,36 @@ class VenueCard extends StatelessWidget {
                 height: 10,
               ),
               Text(
-                'Faculty: ' + faculty,
+                'Department: ' + department,
+                textAlign: TextAlign.center,
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
               ),
               SizedBox(
                 height: 10,
               ),
               Text(
-                'Department: ' + department,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+                'Faculty ',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Name: ' + facultyName.toString(),
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                    color: Colors.black54),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Email: ' + facultyMail.toString(),
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17,
+                    color: Colors.black54),
               ),
               // SizedBox(
               //   height: 7,
@@ -272,7 +298,8 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
       newVenueType = 'CLASS',
       newVenueDepartment = 'NONE',
       newVenueCapacity = '',
-      newVenueFaculty = 'ADMINISTRATOR';
+      newVenueFacultyName = 'NONE',
+      newVenueFacultyMail = 'NONE';
 
   List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
 
@@ -286,14 +313,29 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
     'CIVIL'
   ];
 
-  List<String> facultyList = ['ADMINISTRATOR'];
+  List<String> facultyNameList = ['NONE'];
+  List<String> facultyEmailList = ['NONE'];
+
   void getallFaculties() async {
     final facultyData =
         await _firestore.collection('Faculty User Details').get();
     final faculties = facultyData.docs;
     for (var faculty1 in faculties) {
       setState(() {
-        facultyList.add(faculty1.data()['Name']);
+        facultyEmailList.add(faculty1.data()['Email']);
+        facultyNameList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  void getAdmin() async {
+    final adminData =
+        await _firestore.collection('Administrator User Details').get();
+    final admins = adminData.docs;
+    for (var admin1 in admins) {
+      setState(() {
+        facultyEmailList.add(admin1.data()['Email']);
+        facultyNameList.add('ADMINISTRATOR');
       });
     }
   }
@@ -301,198 +343,228 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
   @override
   void initState() {
     super.initState();
+    getAdmin();
     getallFaculties();
+  }
+
+  Widget facultyNameFromMailWidget(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return Text(facultyNameList[i]);
+      }
+    }
+    return Text('');
+  }
+
+  String facultyNameFromMailString(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return facultyNameList[i];
+      }
+    }
+    return ' ';
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Color(0xFF757575),
+    return SafeArea(
       child: Container(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(30), topLeft: Radius.circular(30))),
-        padding: EdgeInsets.fromLTRB(40, 45, 40, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Add Venue',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 35),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Name',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextField(
-                onChanged: (value) {
-                  newVenueName = value;
-                },
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    fillColor: Color(0xfff3f3f4),
-                    filled: true)),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Type',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            DropdownButton<String>(
-              isExpanded: true,
-              iconEnabledColor: Color(0xfff7892b),
-              iconSize: 60,
-              value: newVenueType,
-              items: venueTypes.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                // Change function parameter to nullable string
-                setState(() {
-                  newVenueType = newValue!;
-                });
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Department',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            DropdownButton<String>(
-              isExpanded: true,
-              iconEnabledColor: Color(0xfff7892b),
-              iconSize: 60,
-              value: newVenueDepartment,
-              items: departments.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                // Change function parameter to nullable string
-                setState(() {
-                  newVenueDepartment = newValue!;
-                });
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Handling Faculty',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            DropdownButton<String>(
-              isExpanded: true,
-              iconEnabledColor: Color(0xfff7892b),
-              iconSize: 60,
-              value: newVenueFaculty,
-              items: facultyList.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                // Change function parameter to nullable string
-                setState(() {
-                  newVenueFaculty = newValue!;
-                });
-              },
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Capacity',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextField(
-                onChanged: (value) {
-                  newVenueCapacity = value;
-                },
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    fillColor: Color(0xfff3f3f4),
-                    filled: true)),
-            SizedBox(
-              height: 30,
-            ),
-            GestureDetector(
-              onTap: () async {
-                await _firestore.collection('Venues').add({
-                  'Name': newVenueName,
-                  'Type': newVenueType,
-                  'Department': newVenueDepartment,
-                  'Capacity': newVenueCapacity,
-                  'Faculty': newVenueFaculty
-                });
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Expanded(
-                      child: AlertDialog(
-                        title: Text('Venue Added Succesfully'),
-                        // content: Text('GeeksforGeeks'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                'OK',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              child: Container(
-                width: double.infinity,
-                height: 60,
-                color: Color(0xffe46b10),
-                child: Center(
-                    child: Text(
-                  'Add',
-                  style: TextStyle(fontSize: 26, color: Colors.white),
-                )),
+        color: Color(0xFF757575),
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(30), topLeft: Radius.circular(30))),
+          padding: EdgeInsets.fromLTRB(40, 45, 40, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Add Venue',
+                style: TextStyle(color: Color(0xffe46b10), fontSize: 35),
               ),
-            )
-          ],
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Name',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                  onChanged: (value) {
+                    newVenueName = value;
+                  },
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      fillColor: Color(0xfff3f3f4),
+                      filled: true)),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Type',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              DropdownButton<String>(
+                isExpanded: true,
+                iconEnabledColor: Color(0xfff7892b),
+                iconSize: 60,
+                value: newVenueType,
+                items: venueTypes.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  // Change function parameter to nullable string
+                  setState(() {
+                    newVenueType = newValue!;
+                  });
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Department',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              DropdownButton<String>(
+                isExpanded: true,
+                iconEnabledColor: Color(0xfff7892b),
+                iconSize: 60,
+                value: newVenueDepartment,
+                items:
+                    departments.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  // Change function parameter to nullable string
+                  setState(() {
+                    newVenueDepartment = newValue!;
+                  });
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Handling Faculty',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              DropdownButton<String>(
+                isExpanded: true,
+                iconEnabledColor: Color(0xfff7892b),
+                iconSize: 60,
+                value: newVenueFacultyMail,
+                items: facultyEmailList
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: facultyNameFromMailWidget(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  // Change function parameter to nullable string
+                  setState(() {
+                    newVenueFacultyMail = newValue!;
+                    newVenueFacultyName =
+                        facultyNameFromMailString(newVenueFacultyMail);
+                  });
+                },
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Capacity',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                  onChanged: (value) {
+                    newVenueCapacity = value;
+                  },
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      fillColor: Color(0xfff3f3f4),
+                      filled: true)),
+              SizedBox(
+                height: 30,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _firestore.collection('Venues').add({
+                    'Name': newVenueName,
+                    'Type': newVenueType,
+                    'Department': newVenueDepartment,
+                    'Capacity': newVenueCapacity,
+                    'Faculty Email': newVenueFacultyMail,
+                    'Faculty Name': newVenueFacultyName
+                  });
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Expanded(
+                        child: AlertDialog(
+                          title: Text('Venue Added Succesfully'),
+                          // content: Text('GeeksforGeeks'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 60,
+                  color: Color(0xffe46b10),
+                  child: Center(
+                      child: Text(
+                    'Add',
+                    style: TextStyle(fontSize: 26, color: Colors.white),
+                  )),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -535,7 +607,11 @@ class MessageStream extends StatelessWidget {
                     .toLowerCase()
                     .contains(searchText.toLowerCase()) ||
                 venue
-                    .data()['Faculty']
+                    .data()['Faculty Email']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                venue
+                    .data()['Faculty Name']
                     .toLowerCase()
                     .contains(searchText.toLowerCase())) {
               VenueList.add(VenueCard(
@@ -544,7 +620,8 @@ class MessageStream extends StatelessWidget {
                 capacity: venue.data()['Capacity'],
                 department: venue.data()['Department'],
                 venueDocumentID: venue.id,
-                faculty: venue.data()['Faculty'],
+                facultyName: venue.data()['Faculty Name'],
+                facultyMail: venue.data()['Faculty Email'],
               ));
             }
           }

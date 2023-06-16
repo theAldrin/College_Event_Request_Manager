@@ -20,11 +20,12 @@ class _Department_detail_editState extends State<Department_detail_edit> {
         .get();
     setState(() {
       name = event.data()?['Name'];
-      hod = event.data()?['HOD'];
+      hodMail = event.data()?['HOD Email'];
     });
   }
 
-  List<String> facultyList = ['ADMINISTRATOR'];
+  List<String> facultyNameList = ['NONE'];
+  List<String> facultyEmailList = ['NONE'];
 
   void getallFaculties() async {
     final facultyData =
@@ -32,9 +33,32 @@ class _Department_detail_editState extends State<Department_detail_edit> {
     final faculties = facultyData.docs;
     for (var faculty1 in faculties) {
       setState(() {
-        facultyList.add(faculty1.data()['Name']);
+        facultyEmailList.add(faculty1.data()['Email']);
+        facultyNameList.add(faculty1.data()['Name']);
       });
     }
+  }
+
+  Widget facultyNameFromMailWidget(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return Text(facultyNameList[i]);
+      }
+    }
+    return Text('');
+  }
+
+  String facultyNameFromMailString(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return facultyNameList[i];
+      }
+    }
+    return ' ';
   }
 
   @override
@@ -62,7 +86,7 @@ class _Department_detail_editState extends State<Department_detail_edit> {
   }
 
   //String? _selectedOption = 'STUDENT';
-  late String name = '', hod = 'ADMINISTRATOR';
+  late String name = '', hodMail = 'NONE', hodName = 'NONE';
 
   @override
   Widget build(BuildContext context) {
@@ -83,25 +107,26 @@ class _Department_detail_editState extends State<Department_detail_edit> {
                   _title(),
                   SizedBox(height: 50),
                   Text(
-                    'TYPE',
+                    'HOD',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   DropdownButton<String>(
                     isExpanded: true,
                     iconEnabledColor: Color(0xfff7892b),
                     iconSize: 60,
-                    value: hod,
-                    items: facultyList
+                    value: hodMail,
+                    items: facultyEmailList
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value),
+                        child: facultyNameFromMailWidget(value),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
                       // Change function parameter to nullable string
                       setState(() {
-                        hod = newValue!;
+                        hodMail = newValue!;
+                        hodName = facultyNameFromMailString(hodMail);
                       });
                     },
                   ),
@@ -114,9 +139,8 @@ class _Department_detail_editState extends State<Department_detail_edit> {
                           await _firestore
                               .collection('Departments')
                               .doc(widget.departmentDocumentID)
-                              .update({
-                            'HOD': hod,
-                          });
+                              .update(
+                                  {'HOD Email': hodMail, 'HOD Name': hodName});
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
