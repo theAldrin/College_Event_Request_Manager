@@ -77,7 +77,7 @@ class _DepartmentState extends State<Department> {
                           padding: EdgeInsets.only(
                               bottom: MediaQuery.of(context).viewInsets.bottom +
                                   30),
-                          child: AddVenueScreen(),
+                          child: AddDepartmentScreen(),
                         )),
                       );
                     },
@@ -165,68 +165,68 @@ class DepartmentCard extends StatelessWidget {
         margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(15, 20, 10, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // SizedBox(
-              //   width: 20,
-              // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
                         departmentName,
                         style: TextStyle(
                             fontWeight: FontWeight.w900, fontSize: 20),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Capacity: ' + hod.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 17),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Department_detail_edit(
-                                departmentDocumentID: departmentDocumentID,
-                              ),
-                            ));
-                      },
-                      child: Container(
-                        //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        width: 70,
-                        padding: EdgeInsets.symmetric(vertical: 7),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(6)),
-                            // boxShadow: <BoxShadow>[
-                            //   BoxShadow(
-                            //       color: Colors.grey.shade900,
-                            //       offset: Offset(2, 4),
-                            //       blurRadius: 5,
-                            //       spreadRadius: 2)
-                            // ],
-                            color: Color(0xFF000000)),
-                        child: Text(
-                          'EDIT',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'HOD: ' + hod.toString(),
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Department_detail_edit(
+                              departmentDocumentID: departmentDocumentID,
+                            ),
+                          ));
+                    },
+                    child: Container(
+                      //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      width: 70,
+                      padding: EdgeInsets.symmetric(vertical: 7),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                          // boxShadow: <BoxShadow>[
+                          //   BoxShadow(
+                          //       color: Colors.grey.shade900,
+                          //       offset: Offset(2, 4),
+                          //       blurRadius: 5,
+                          //       spreadRadius: 2)
+                          // ],
+                          color: Color(0xFF000000)),
+                      child: Text(
+                        'EDIT',
+                        style: TextStyle(fontSize: 15, color: Colors.white),
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
             ],
           ),
@@ -236,15 +236,16 @@ class DepartmentCard extends StatelessWidget {
   }
 }
 
-class AddVenueScreen extends StatefulWidget {
+class AddDepartmentScreen extends StatefulWidget {
   @override
-  State<AddVenueScreen> createState() => _AddVenueScreenState();
+  State<AddDepartmentScreen> createState() => _AddDepartmentScreenState();
 }
 
-class _AddVenueScreenState extends State<AddVenueScreen> {
+class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
   late String departmentName, hod = 'ADMINISTRATOR';
 
   List<String> facultyList = ['ADMINISTRATOR'];
+
   void getallFaculties() async {
     final facultyData =
         await _firestore.collection('Faculty User Details').get();
@@ -264,116 +265,118 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Color(0xFF757575),
+    return SafeArea(
       child: Container(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(30), topLeft: Radius.circular(30))),
-        padding: EdgeInsets.fromLTRB(40, 45, 40, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Add Deaprtment',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 35),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Name',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextField(
-                onChanged: (value) {
-                  departmentName = value;
-                },
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    fillColor: Color(0xfff3f3f4),
-                    filled: true)),
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              'HOD',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            DropdownButton<String>(
-              isExpanded: true,
-              iconEnabledColor: Color(0xfff7892b),
-              iconSize: 60,
-              value: hod,
-              items: facultyList.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                // Change function parameter to nullable string
-                setState(() {
-                  hod = newValue!;
-                });
-              },
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            GestureDetector(
-              onTap: () async {
-                await _firestore.collection('Departments').add({
-                  'Name': departmentName,
-                  'HOD': hod,
-                });
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Expanded(
-                      child: AlertDialog(
-                        title: Text('Department Added Succesfully'),
-                        // content: Text('GeeksforGeeks'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                'OK',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              child: Container(
-                width: double.infinity,
-                height: 60,
-                color: Color(0xffe46b10),
-                child: Center(
-                    child: Text(
-                  'Add',
-                  style: TextStyle(fontSize: 26, color: Colors.white),
-                )),
+        color: Color(0xFF757575),
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(30), topLeft: Radius.circular(30))),
+          padding: EdgeInsets.fromLTRB(40, 45, 40, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Add Deaprtment',
+                style: TextStyle(color: Color(0xffe46b10), fontSize: 35),
               ),
-            )
-          ],
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Name',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              TextField(
+                  onChanged: (value) {
+                    departmentName = value;
+                  },
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      fillColor: Color(0xfff3f3f4),
+                      filled: true)),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'HOD',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              DropdownButton<String>(
+                isExpanded: true,
+                iconEnabledColor: Color(0xfff7892b),
+                iconSize: 60,
+                value: hod,
+                items:
+                    facultyList.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  // Change function parameter to nullable string
+                  setState(() {
+                    hod = newValue!;
+                  });
+                },
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _firestore.collection('Departments').add({
+                    'Name': departmentName,
+                    'HOD': hod,
+                  });
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Expanded(
+                        child: AlertDialog(
+                          title: Text('Department Added Succesfully'),
+                          // content: Text('GeeksforGeeks'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 60,
+                  color: Color(0xffe46b10),
+                  child: Center(
+                      child: Text(
+                    'Add',
+                    style: TextStyle(fontSize: 26, color: Colors.white),
+                  )),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

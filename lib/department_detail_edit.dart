@@ -23,7 +23,6 @@ class _Department_detail_editState extends State<Department_detail_edit> {
       hod = event.data()?['HOD'];
     });
   }
-  //ffdfdfdsfdfdfsdfsdfsdfs
 
   List<String> facultyList = ['ADMINISTRATOR'];
 

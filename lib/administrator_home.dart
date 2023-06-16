@@ -1,3 +1,4 @@
+import 'package:event_consent2/Add_Info.dart';
 import 'package:event_consent2/venues.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _Administrator_homeState extends State<Administrator_home> {
           Event_request(
             userType: 'ADMINISTRATOR',
           ),
-          Venues(),
+          Add_Info(),
           Calendar()
         ],
       ),
