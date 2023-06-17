@@ -22,7 +22,8 @@ class _Event_requestState extends State<Event_request> {
       eventName = '',
       formattedStartTime = '',
       formattedEndTime = '',
-      description = '';
+      description = '',
+      club = 'NONE';
   List<String> venuesList = ['OUTSIDE CAMPUS'];
   List<String> facultyList = ['ADMINISTRATOR'];
   String? venue = 'OUTSIDE CAMPUS', faculty = 'ADMINISTRATOR';
@@ -61,12 +62,24 @@ class _Event_requestState extends State<Event_request> {
     }
   }
 
+  List<String> clubsList = ['NONE'];
+  void getallClubs() async {
+    final facultyData = await _firestore.collection('Clubs').get();
+    final faculties = facultyData.docs;
+    for (var faculty1 in faculties) {
+      setState(() {
+        clubsList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
     getAllVenues();
     getallFaculties();
+    getallClubs();
   }
 
   Widget _title() {
@@ -83,6 +96,69 @@ class _Event_requestState extends State<Event_request> {
         ),
       ),
     );
+  }
+
+  List<String> requiredFacs = [];
+  void requiredFaculties() async {
+    final clubData = await _firestore.collection('Clubs').get();
+    final clubs = clubData.docs;
+    for (var club1 in clubs) {
+      if (club1.data()['Name'] == club) {
+        setState(() {
+          requiredFacs.add(club1.data()['Faculty Advisor Email']);
+        });
+      }
+    }
+
+    final venueData = await _firestore.collection('Venues').get();
+    final venues = venueData.docs;
+    for (var venue1 in venues) {
+      if (venue1.data()['Name'] == venue) {
+        setState(() {
+          requiredFacs.add(venue1.data()['Faculty Email']);
+        });
+      }
+    }
+
+    if (widget.userType == 'STUDENT') {
+      final studentData =
+          await _firestore.collection('Student User Details').get();
+      final students = studentData.docs;
+      for (var student1 in students) {
+        if (student1.data()['Email'] == loggedInUser.email) {
+          String studentDepartment = student1.data()['Department'];
+          final departmentData =
+              await _firestore.collection('Departments').get();
+          final departments = departmentData.docs;
+          for (var department1 in departments) {
+            if (department1.data()['Name'] == studentDepartment) {
+              setState(() {
+                requiredFacs.add(department1.data()['HOD Email']);
+              });
+            }
+          }
+        }
+      }
+    } else if (widget.userType == 'FACULTY') {
+      final studentData =
+          await _firestore.collection('Faculty User Details').get();
+      final students = studentData.docs;
+      for (var student1 in students) {
+        if (student1.data()['Email'] == loggedInUser.email) {
+          String studentDepartment = student1.data()['Department'];
+          final departmentData =
+              await _firestore.collection('Departments').get();
+          final departments = departmentData.docs;
+          for (var department1 in departments) {
+            if (department1.data()['Name'] == studentDepartment) {
+              setState(() {
+                requiredFacs.add(department1.data()['HOD Email']);
+              });
+            }
+          }
+        }
+      }
+    }
   }
 
   late int clashFlag;
@@ -296,6 +372,32 @@ class _Event_requestState extends State<Event_request> {
                       },
                     ), //hallRoom
                     SizedBox(height: 10),
+                    Text(
+                      'Associated Club',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    SizedBox(height: 8),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      iconEnabledColor: Color(0xfff7892b),
+                      iconSize: 30,
+                      value: club,
+                      items: clubsList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        // Change function parameter to nullable string
+                        setState(() {
+                          club = newValue!;
+                        });
+                      },
+                    ), //hallRoom
+                    SizedBox(height: 10),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
                       child: Column(
@@ -471,6 +573,7 @@ class _Event_requestState extends State<Event_request> {
                                   actions: [
                                     TextButton(
                                       onPressed: () async {
+                                        requiredFaculties();
                                         final constantDB = await _firestore
                                             .collection('Constants')
                                             .get();
@@ -498,6 +601,8 @@ class _Event_requestState extends State<Event_request> {
                                           'TimeStamp':
                                               FieldValue.serverTimestamp(),
                                           'User Type': widget.userType,
+                                          'Club': club,
+                                          'Required Faculties': requiredFacs,
                                           'Reason For Removal': ' ',
                                           'Rejected User': ' '
                                         });
