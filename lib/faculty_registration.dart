@@ -143,7 +143,7 @@ class _Faculty_registrationState extends State<Faculty_registration> {
               'College': 'TKM COLLEGE OF ENGINEERING',
               'Department': department,
               'Position': position,
-              'Clubs': clubs,
+              'Clubs': club,
               'Phone No': phoneno,
             });
             showDialog(
@@ -211,13 +211,42 @@ class _Faculty_registrationState extends State<Faculty_registration> {
 
   //String? _selectedOption = 'STUDENT';
 
+  List<String> clubsList = ['NONE'];
+  void getallClubs() async {
+    final facultyData = await _firestore.collection('Clubs').get();
+    final faculties = facultyData.docs;
+    for (var faculty1 in faculties) {
+      setState(() {
+        clubsList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  List<String> departmentList = ['NONE'];
+  void getallDepartments() async {
+    final facultyData = await _firestore.collection('Departments').get();
+    final faculties = facultyData.docs;
+    for (var faculty1 in faculties) {
+      setState(() {
+        departmentList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getallClubs();
+    getallDepartments();
+  }
+
   late String email,
       password,
       cnfPassword,
       name,
-      department,
+      department = 'NONE',
       position,
-      clubs,
+      club = 'NONE',
       phoneno;
   final _auth = FirebaseAuth.instance;
   @override
@@ -280,14 +309,25 @@ class _Faculty_registrationState extends State<Faculty_registration> {
                         SizedBox(
                           height: 10,
                         ),
-                        TextField(
-                            onChanged: (value) {
-                              department = value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          iconEnabledColor: Color(0xfff7892b),
+                          iconSize: 60,
+                          value: department,
+                          items: departmentList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            // Change function parameter to nullable string
+                            setState(() {
+                              department = newValue!;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -323,21 +363,32 @@ class _Faculty_registrationState extends State<Faculty_registration> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Clubs',
+                          'Faculty Advisor of the Club',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                         SizedBox(
                           height: 10,
                         ),
-                        TextField(
-                            onChanged: (value) {
-                              clubs = value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          iconEnabledColor: Color(0xfff7892b),
+                          iconSize: 60,
+                          value: club,
+                          items: clubsList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            // Change function parameter to nullable string
+                            setState(() {
+                              club = newValue!;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
