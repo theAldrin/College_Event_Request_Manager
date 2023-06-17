@@ -1,7 +1,6 @@
 import 'package:event_consent2/departments.dart';
 import 'package:event_consent2/venues.dart';
 import 'package:flutter/material.dart';
-
 import 'package:event_consent2/clubs.dart';
 
 class Add_Info extends StatefulWidget {
@@ -18,9 +17,10 @@ class _Add_InfoState extends State<Add_Info> {
       text: TextSpan(
         text: 'Information',
         style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.w700,
-            color: Color(0xffe46b10)),
+          fontSize: 40,
+          fontWeight: FontWeight.w700,
+          color: Color(0xffe46b10),
+        ),
       ),
     );
   }
@@ -42,9 +42,8 @@ class _Add_InfoState extends State<Add_Info> {
               SizedBox(
                 height: 15,
               ),
-              SingleChildScrollView(
-                child: Column(
-                  //padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10),
+              Expanded(
+                child: ListView(
                   children: [
                     InfoCard(
                       infoType: 'Venues',
@@ -94,22 +93,33 @@ class InfoCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                  color: Color(0x13000000),
-                  blurRadius: 5,
-                  spreadRadius: 1,
-                  offset: Offset(0, 5)),
+                color: Color(0x13000000),
+                blurRadius: 5,
+                spreadRadius: 1,
+                offset: Offset(0, 5),
+              ),
             ],
           ),
           margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 20, 10, 20),
+            padding: const EdgeInsets.fromLTRB(15, 25, 10, 25),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
                   child: Text(
                     infoType,
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black54,
+                    ),
                   ),
+                ),
+                Icon(
+                  Icons.navigate_next,
+                  size: 60,
+                  color: Colors.black54,
                 )
               ],
             ),
