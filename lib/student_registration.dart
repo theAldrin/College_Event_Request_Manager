@@ -146,7 +146,7 @@ class _Student_registrationState extends State<Student_registration> {
               'Department': department,
               'Class': clas,
               'Year': year,
-              'Clubs': clubs,
+              'Clubs': club,
               'Phone No': phoneno,
             });
             showDialog(
@@ -212,17 +212,59 @@ class _Student_registrationState extends State<Student_registration> {
     );
   }
 
-  //String? _selectedOption = 'STUDENT';
+  List<String> clubsList = ['NONE'];
+  void getallClubs() async {
+    final facultyData = await _firestore.collection('Clubs').get();
+    final faculties = facultyData.docs;
+    for (var faculty1 in faculties) {
+      setState(() {
+        clubsList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  List<String> departmentList = ['NONE'];
+  void getallDepartments() async {
+    final facultyData = await _firestore.collection('Departments').get();
+    final faculties = facultyData.docs;
+    for (var faculty1 in faculties) {
+      setState(() {
+        departmentList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  List<String> classList = ['NONE'];
+  void getallClass() async {
+    final facultyData = await _firestore.collection('Venues').get();
+    final faculties = facultyData.docs;
+    for (var faculty1 in faculties) {
+      if (faculty1.data()['Type'] == 'CLASS') {
+        setState(() {
+          classList.add(faculty1.data()['Name']);
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getallClubs();
+    getallDepartments();
+    getallClass();
+  }
 
   late String email,
       password,
       cnfPassword,
       name,
-      department,
-      year,
-      clas,
-      clubs,
+      department = 'NONE',
+      year = '1',
+      clas = 'NONE',
+      club = 'NONE',
       phoneno;
+  List<String> years = ['1', '2', '3', '4', '5'];
   final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
@@ -284,14 +326,25 @@ class _Student_registrationState extends State<Student_registration> {
                         SizedBox(
                           height: 10,
                         ),
-                        TextField(
-                            onChanged: (value) {
-                              department = value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          iconEnabledColor: Color(0xfff7892b),
+                          iconSize: 30,
+                          value: department,
+                          items: departmentList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            // Change function parameter to nullable string
+                            setState(() {
+                              department = newValue!;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -309,14 +362,25 @@ class _Student_registrationState extends State<Student_registration> {
                         SizedBox(
                           height: 10,
                         ),
-                        TextField(
-                            onChanged: (value) {
-                              year = value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          iconEnabledColor: Color(0xfff7892b),
+                          iconSize: 30,
+                          value: year,
+                          items: years
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            // Change function parameter to nullable string
+                            setState(() {
+                              year = newValue!;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -334,14 +398,25 @@ class _Student_registrationState extends State<Student_registration> {
                         SizedBox(
                           height: 10,
                         ),
-                        TextField(
-                            onChanged: (value) {
-                              clas = value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          iconEnabledColor: Color(0xfff7892b),
+                          iconSize: 30,
+                          value: clas,
+                          items: classList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            // Change function parameter to nullable string
+                            setState(() {
+                              clas = newValue!;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -352,21 +427,32 @@ class _Student_registrationState extends State<Student_registration> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Clubs',
+                          'Student Head of the Club',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                         SizedBox(
                           height: 10,
                         ),
-                        TextField(
-                            onChanged: (value) {
-                              clubs = value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Color(0xfff3f3f4),
-                                filled: true))
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          iconEnabledColor: Color(0xfff7892b),
+                          iconSize: 30,
+                          value: club,
+                          items: clubsList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            // Change function parameter to nullable string
+                            setState(() {
+                              club = newValue!;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),

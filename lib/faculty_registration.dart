@@ -312,7 +312,7 @@ class _Faculty_registrationState extends State<Faculty_registration> {
                         DropdownButton<String>(
                           isExpanded: true,
                           iconEnabledColor: Color(0xfff7892b),
-                          iconSize: 60,
+                          iconSize: 30,
                           value: department,
                           items: departmentList
                               .map<DropdownMenuItem<String>>((String value) {
@@ -373,7 +373,7 @@ class _Faculty_registrationState extends State<Faculty_registration> {
                         DropdownButton<String>(
                           isExpanded: true,
                           iconEnabledColor: Color(0xfff7892b),
-                          iconSize: 60,
+                          iconSize: 30,
                           value: club,
                           items: clubsList
                               .map<DropdownMenuItem<String>>((String value) {
