@@ -79,7 +79,7 @@ class _Administrator_homeState extends State<Administrator_home> {
           RollingBottomBarItem(Icons.add_box,
               label: 'Add Event', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.home_rounded,
-              label: 'Venues', activeColor: Color(0xfff3892b)),
+              label: 'Info', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.calendar_month,
               label: 'Calendar', activeColor: Color(0xfff3892b)),
         ],

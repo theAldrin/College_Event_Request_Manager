@@ -1,3 +1,4 @@
+import 'package:event_consent2/calendar.dart';
 import 'package:event_consent2/departments.dart';
 import 'package:event_consent2/venues.dart';
 import 'package:flutter/material.dart';
@@ -47,16 +48,48 @@ class _Add_InfoState extends State<Add_Info> {
                   children: [
                     InfoCard(
                       infoType: 'Venues',
-                      onPressed: Venues(),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Venues(),
+                          ),
+                        );
+                      },
                     ),
                     InfoCard(
                       infoType: 'Departments',
-                      onPressed: Department(),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Department(),
+                          ),
+                        );
+                      },
                     ),
                     InfoCard(
                       infoType: 'Clubs',
-                      onPressed: Clubs(),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Clubs(),
+                          ),
+                        );
+                      },
                     ),
+                    InfoCard(
+                      infoType: 'Calendar',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Calendar(),
+                          ),
+                        );
+                      },
+                    )
                   ],
                 ),
               ),
@@ -71,17 +104,14 @@ class _Add_InfoState extends State<Add_Info> {
 class InfoCard extends StatelessWidget {
   InfoCard({required this.infoType, required this.onPressed});
   final String infoType;
-  final Widget onPressed;
+  final void Function() onPressed;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
       child: TextButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => onPressed));
-        },
+        onPressed: onPressed,
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(

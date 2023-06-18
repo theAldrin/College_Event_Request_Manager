@@ -28,10 +28,25 @@ class _Pending_eventsState extends State<Pending_events> {
     }
   }
 
+  var admins, students, faculties;
+
+  void getData() async {
+    var admins1 =
+        await _firestore.collection("Administrator User Details").get();
+    var faculties1 = await _firestore.collection("Faculty User Details").get();
+    var students1 = await _firestore.collection("Student User Details").get();
+    setState(() {
+      admins = admins1;
+      faculties = faculties1;
+      students = students1;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
+    getData();
   }
 
   Widget _title() {
@@ -47,7 +62,7 @@ class _Pending_eventsState extends State<Pending_events> {
     );
   }
 
-  String? _selectedOption = 'ALL';
+  String _searchText = '';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -62,29 +77,45 @@ class _Pending_eventsState extends State<Pending_events> {
                 child: _title(),
                 width: double.infinity,
               ),
-              DropdownButton<String>(
-                //isExpanded: true,
-                iconEnabledColor: Color(0xfff7892b),
-                iconSize: 60,
-                value: _selectedOption,
-                items: <String>[
-                  'ALL',
-                  'DATE AND TIME VERIFIED',
-                  'DATE AND TIME NOT VERIFIED',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  // Change function parameter to nullable string
-                  setState(() {
-                    _selectedOption = newValue;
-                  });
-                },
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                child: SizedBox(
+                  height: 40,
+                  child: TextFormField(
+                    // style: ,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchText = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                        focusColor: Colors.grey,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: "Search",
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: const BorderSide(width: 4)),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          size: 15,
+                        )),
+                  ),
+                ),
               ),
-              MessageStream()
+              SizedBox(
+                height: 10,
+              ),
+              MessageStream(
+                searchText: _searchText,
+                students: students,
+                faculties: faculties,
+                admins: admins,
+              )
             ],
           ),
         ),
@@ -93,7 +124,42 @@ class _Pending_eventsState extends State<Pending_events> {
   }
 }
 
+String generatedUserName(
+    String type, String mail, var admins, var faculties, var students) {
+  if (admins != null && faculties != null && students != null) {
+    if (type == 'ADMINISTRATOR') {
+      for (var admin in admins.docs) {
+        if (admin.data()['Email'] == mail) {
+          return admin.data()['Name'];
+        }
+      }
+    } else if (type == 'FACULTY') {
+      for (var faculty in faculties.docs) {
+        if (faculty.data()['Email'] == mail) {
+          return faculty.data()['Name'];
+        }
+      }
+    } else if (type == 'STUDENT') {
+      for (var student in students.docs) {
+        if (student.data()['Email'] == mail) {
+          return student.data()['Name'];
+        }
+      }
+    }
+    return '';
+  } else {
+    return '';
+  }
+}
+
 class MessageStream extends StatelessWidget {
+  MessageStream(
+      {required this.searchText,
+      required this.students,
+      required this.faculties,
+      required this.admins});
+  final String searchText;
+  var students, faculties, admins;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -114,12 +180,35 @@ class MessageStream extends StatelessWidget {
             // List facultiesInvolved = event.data()['Faculties Involved'];
             if ((loggedInUser.email ==
                     event.data()['FacultIies Involved'].last) &&
-                (event.data()['Status'] == 'ONGOING')) {
+                (event.data()['Status'] == 'ONGOING') &&
+                (event
+                        .data()['Event Name']
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()) ||
+                    event
+                        .data()['ID']
+                        .toString()
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()) ||
+                    event
+                        .data()['Date']
+                        .toString()
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()) ||
+                    event
+                        .data()['Generated User']
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()))) {
               final eventCard = EventCard(
                   eventTitle: event.data()['Event Name'],
                   eventId: event.data()['ID'].toString(),
                   date: event.data()['Date'],
-                  student: event.data()['Generated User'],
+                  student: generatedUserName(
+                      event.data()['User Type'],
+                      event.data()['Generated User'],
+                      admins,
+                      faculties,
+                      students),
                   eventstatus: 'ONGOING',
                   nextpage: Pending_Event_Details(
                     eventDocumentID: event.id,

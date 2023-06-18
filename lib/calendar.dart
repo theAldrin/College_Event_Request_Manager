@@ -1,22 +1,47 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-class Calendar extends StatelessWidget {
+class Calendar extends StatefulWidget {
   const Calendar({super.key});
 
   @override
+  State<Calendar> createState() => _CalendarState();
+}
+
+final _firestore = FirebaseFirestore.instance;
+
+class _CalendarState extends State<Calendar> {
+  var events;
+  void getEventDetails() async {
+    final events1 = await _firestore.collection("Event Request").get();
+    setState(() {
+      events = events1.docs;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getEventDetails();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AppointmentDetails(),
+      home: AppointmentDetails(
+        events: events,
+      ),
     );
   }
 }
 
 class AppointmentDetails extends StatefulWidget {
-  const AppointmentDetails({super.key});
-
+  AppointmentDetails({super.key, @required this.events});
+  var events;
   @override
   State<StatefulWidget> createState() => ScheduleExample();
 }
@@ -41,10 +66,11 @@ class ScheduleExample extends State<AppointmentDetails> {
         appBar: AppBar(
           shadowColor: Colors.white,
           elevation: 0,
-          title: _title(),
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0x00FFFFFF),
         ),
         body: SfCalendar(
+          cellBorderColor: Colors.black12,
+          todayHighlightColor: Colors.orange,
           allowedViews: const [
             CalendarView.day,
             CalendarView.week,
@@ -74,20 +100,42 @@ class ScheduleExample extends State<AppointmentDetails> {
     }
   }
 
+  String formatString(String input) {
+    List<String> parts = input.split('-'); // Split the input string by hyphens
+    List<String> reversedParts =
+        parts.reversed.toList(); // Reverse the order of the parts
+    return reversedParts.join(
+        '-'); // Join the reversed parts with hyphens and return the result
+  }
+
   _AppointmentDataSource _getCalendarDataSource() {
     List<Appointment> appointments = <Appointment>[];
-    appointments.add(Appointment(
-      startTime: DateTime.now(),
-      endTime: DateTime.now().add(const Duration(hours: 2)),
-      subject: 'Meeting',
-      color: Colors.green,
-    ));
-    appointments.add(Appointment(
-      startTime: DateTime.now().add(const Duration(hours: 3)),
-      endTime: DateTime.now().add(const Duration(hours: 4)),
-      subject: 'Planning',
-      color: Colors.orange,
-    ));
+
+    if (widget.events != null) {
+      for (var event in widget.events) {
+        print(event.data()['Event Name']);
+        appointments.add(Appointment(
+          startTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
+              '${formatString(event.data()['Date']) + ' ' + event.data()['Event Start Time']}:00'),
+          endTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
+              '${formatString(event.data()['Date']) + ' ' + event.data()['Event End Time']}:00'),
+          subject: event.data()['Event Name'],
+          color: Colors.green,
+        ));
+      }
+    }
+    // appointments.add(Appointment(
+    //   startTime: DateTime.now(),
+    //   endTime: DateTime.now().add(const Duration(hours: 2)),
+    //   subject: 'Meeting',
+    //   color: Colors.green,
+    // ));
+    // appointments.add(Appointment(
+    //   startTime: DateTime.now().add(const Duration(hours: 3)),
+    //   endTime: DateTime.now().add(const Duration(hours: 4)),
+    //   subject: 'Planning',
+    //   color: Colors.orange,
+    // ));
     return _AppointmentDataSource(appointments);
   }
 }

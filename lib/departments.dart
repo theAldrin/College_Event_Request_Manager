@@ -396,6 +396,7 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
+                                Navigator.pop(context);
                               },
                               child: Container(
                                 padding: EdgeInsets.all(10),

@@ -535,6 +535,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
+                                Navigator.pop(context);
                               },
                               child: Container(
                                 padding: EdgeInsets.all(10),
@@ -550,7 +551,6 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
                       );
                     },
                   );
-                  Navigator.pop(context);
                 },
                 child: Container(
                   width: double.infinity,

@@ -1,11 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/administrator_event_details.dart';
 import 'package:flutter/material.dart';
 import 'student_faculty_event_details.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class All_events extends StatefulWidget {
-  const All_events({Key? key}) : super(key: key);
-
   @override
   State<All_events> createState() => _All_eventsState();
 }
@@ -14,6 +13,40 @@ final _firestore = FirebaseFirestore.instance;
 dynamic loggedInUser;
 
 class _All_eventsState extends State<All_events> {
+  final _auth = FirebaseAuth.instance;
+
+  void getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  var admins, students, faculties;
+
+  void getData() async {
+    var admins1 =
+        await _firestore.collection("Administrator User Details").get();
+    var faculties1 = await _firestore.collection("Faculty User Details").get();
+    var students1 = await _firestore.collection("Student User Details").get();
+    setState(() {
+      admins = admins1;
+      faculties = faculties1;
+      students = students1;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getData();
+  }
+
   Widget _title() {
     return RichText(
       textAlign: TextAlign.left,
@@ -27,12 +60,13 @@ class _All_eventsState extends State<All_events> {
     );
   }
 
-  String? _selectedOption = 'ALL';
+  String? _selectedStatus = 'ALL', _selectedUserType = 'ALL';
+  late String _searchText = '';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Color(0xffffffff),
+        backgroundColor: Color(0xffffff),
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -42,32 +76,162 @@ class _All_eventsState extends State<All_events> {
                 child: _title(),
                 width: double.infinity,
               ),
-              DropdownButton<String>(
-                //isExpanded: true,
-                iconEnabledColor: Color(0xfff7892b),
-                iconSize: 30,
-                value: _selectedOption,
-                items: <String>[
-                  'ALL',
-                  'ADMIN ACCEPTED',
-                  'ONGOING',
-                  'REJECTED',
-                  'FINAL ACCEPT RECEIVED',
-                  'COMPLETED'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  // Change function parameter to nullable string
-                  setState(() {
-                    _selectedOption = newValue;
-                  });
-                },
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                child: SizedBox(
+                  height: 40,
+                  child: TextFormField(
+                    // style: ,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchText = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                        focusColor: Colors.grey,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: "Search",
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: const BorderSide(width: 4)),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          size: 15,
+                        )),
+                  ),
+                ),
               ),
-              MessageStream()
+              SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                        child: Text(
+                          'STATUS',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.9,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 0),
+                          child: DropdownButton<String>(
+                            //isExpanded: true,
+                            iconEnabledColor: Color(0xfff7892b),
+                            iconSize: 25,
+                            underline: SizedBox(),
+                            value: _selectedStatus,
+                            items: <String>[
+                              'ALL',
+                              'ADMIN ACCEPTED',
+                              'ONGOING',
+                              'REJECTED',
+                              'FINAL FACULTY ACCEPTED',
+                              'COMPLETED'
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              // Change function parameter to nullable string
+                              setState(() {
+                                _selectedStatus = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                        child: Text(
+                          'USER',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 0.9,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          child: DropdownButton<String>(
+                            //isExpanded: true,
+                            iconEnabledColor: Color(0xfff7892b),
+                            iconSize: 25,
+                            underline: SizedBox(),
+                            value: _selectedUserType,
+                            items: <String>[
+                              'ALL',
+                              'MY EVENTS',
+                              'OTHERS EVENTS',
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              // Change function parameter to nullable string
+                              setState(() {
+                                _selectedUserType = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              MessageStream(
+                searchText: _searchText,
+                selectedStatus: _selectedStatus.toString(),
+                selectedUserType: _selectedUserType.toString(),
+                students: students,
+                faculties: faculties,
+                admins: admins,
+              ),
             ],
           ),
         ),
@@ -76,7 +240,44 @@ class _All_eventsState extends State<All_events> {
   }
 }
 
+String generatedUserName(
+    String type, String mail, var admins, var faculties, var students) {
+  if (admins != null && faculties != null && students != null) {
+    if (type == 'ADMINISTRATOR') {
+      for (var admin in admins.docs) {
+        if (admin.data()['Email'] == mail) {
+          return admin.data()['Name'];
+        }
+      }
+    } else if (type == 'FACULTY') {
+      for (var faculty in faculties.docs) {
+        if (faculty.data()['Email'] == mail) {
+          return faculty.data()['Name'];
+        }
+      }
+    } else if (type == 'STUDENT') {
+      for (var student in students.docs) {
+        if (student.data()['Email'] == mail) {
+          return student.data()['Name'];
+        }
+      }
+    }
+    return '';
+  } else {
+    return '';
+  }
+}
+
 class MessageStream extends StatelessWidget {
+  MessageStream(
+      {required this.searchText,
+      required this.selectedStatus,
+      required this.selectedUserType,
+      required this.students,
+      required this.faculties,
+      required this.admins});
+  final String searchText, selectedUserType, selectedStatus;
+  var students, faculties, admins;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -94,30 +295,64 @@ class MessageStream extends StatelessWidget {
           for (var event in events!) {
             // final messageText = message.data()['text'];
             // final messageSender = message.data()['sender'];
-            final eventCard = EventCard(
-                eventTitle: event.data()['Event Name'],
-                eventId: event.data()['ID'].toString(),
-                date: event.data()['Date'],
-                student: event.data()['Generated User'],
-                eventstatus: event.data()['Status'],
-                nextpage: Administrator_event_details(
-                  status: event.data()['Status'],
-                  name: event.data()['Event Name'],
-                  id: event.data()['ID'].toString(),
-                  date: event.data()['Date'],
-                  student: event.data()['Generated User'],
-                  eventStartTime: event.data()['Event Start Time'],
-                  eventEndTime: event.data()['Event End Time'],
-                  venue: event.data()['Venue'],
-                  description: event.data()['Event Description'],
-                  facultiesInvolved: event.data()['FacultIies Involved'],
-                  userType: event.data()['User Type'],
-                  docID: event.id,
-                  reason: event.data()['Reason For Removal'],
-                  rejectedUser: event.data()['Rejected User'],
-                ),
-                context: context);
-            EventRequests.add(eventCard);
+            if (event
+                    .data()['Event Name']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                event
+                    .data()['ID']
+                    .toString()
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                event
+                    .data()['Date']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                event
+                    .data()['Generated User']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase())) {
+              if ((selectedStatus == 'ALL') ||
+                  (selectedStatus == event.data()['Status'])) {
+                if ((selectedUserType == 'ALL') ||
+                    ((selectedUserType == 'MY EVENTS') &&
+                        (event.data()['Generated User'] ==
+                            loggedInUser.email)) ||
+                    ((selectedUserType == 'OTHERS EVENTS') &&
+                        (event.data()['Generated User'] !=
+                            loggedInUser.email))) {
+                  final eventCard = EventCard(
+                      eventTitle: event.data()['Event Name'],
+                      eventId: event.data()['ID'].toString(),
+                      date: event.data()['Date'],
+                      student: generatedUserName(
+                          event.data()['User Type'],
+                          event.data()['Generated User'],
+                          admins,
+                          faculties,
+                          students),
+                      eventstatus: event.data()['Status'],
+                      nextpage: Administrator_event_details(
+                        name: event.data()['Event Name'],
+                        id: event.data()['ID'].toString(),
+                        date: event.data()['Date'],
+                        student: event.data()['Generated User'],
+                        eventStartTime: event.data()['Event Start Time'],
+                        eventEndTime: event.data()['Event End Time'],
+                        venue: event.data()['Venue'],
+                        description: event.data()['Event Description'],
+                        facultiesInvolved: event.data()['FacultIies Involved'],
+                        status: event.data()['Status'],
+                        userType: event.data()['User Type'],
+                        reason: event.data()['Reason For Removal'],
+                        rejectedUser: event.data()['Rejected User'],
+                        docID: event.id,
+                      ),
+                      context: context);
+                  EventRequests.add(eventCard);
+                }
+              }
+            }
           }
           return Expanded(
             child: ListView(
@@ -150,12 +385,12 @@ class EventCard extends StatelessWidget {
       return Colors.green;
     } else if (eventstatus == 'ONGOING') {
       return Colors.blue;
-    } else if (eventstatus == 'REJECTED') {
+    } else if (eventstatus == 'REJECTED' || eventstatus == 'WITHDRAWN') {
       return Colors.red;
-    } else if (eventstatus == 'FINAL ACCEPT RECEIVED') {
+    } else if (eventstatus == 'FINAL FACULTY ACCEPTED') {
       return Colors.greenAccent;
     } else {
-      return Colors.black38;
+      return Colors.grey;
     }
   }
 
@@ -273,3 +508,279 @@ class EventCard extends StatelessWidget {
     );
   }
 }
+
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:event_consent2/administrator_event_details.dart';
+// import 'package:flutter/material.dart';
+// import 'student_faculty_event_details.dart';
+//
+// class All_events extends StatefulWidget {
+//   const All_events({Key? key}) : super(key: key);
+//
+//   @override
+//   State<All_events> createState() => _All_eventsState();
+// }
+//
+// final _firestore = FirebaseFirestore.instance;
+// dynamic loggedInUser;
+//
+// class _All_eventsState extends State<All_events> {
+//   Widget _title() {
+//     return RichText(
+//       textAlign: TextAlign.left,
+//       text: TextSpan(
+//         text: 'All Events',
+//         style: TextStyle(
+//             fontSize: 40,
+//             fontWeight: FontWeight.w700,
+//             color: Color(0xffe46b10)),
+//       ),
+//     );
+//   }
+//
+//   String? _selectedOption = 'ALL';
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: Scaffold(
+//         backgroundColor: Color(0xffffffff),
+//         body: SafeArea(
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: <Widget>[
+//               Container(
+//                 margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+//                 child: _title(),
+//                 width: double.infinity,
+//               ),
+//               DropdownButton<String>(
+//                 //isExpanded: true,
+//                 iconEnabledColor: Color(0xfff7892b),
+//                 iconSize: 30,
+//                 value: _selectedOption,
+//                 items: <String>[
+//                   'ALL',
+//                   'ADMIN ACCEPTED',
+//                   'ONGOING',
+//                   'REJECTED',
+//                   'FINAL ACCEPT RECEIVED',
+//                   'COMPLETED'
+//                 ].map<DropdownMenuItem<String>>((String value) {
+//                   return DropdownMenuItem<String>(
+//                     value: value,
+//                     child: Text(value),
+//                   );
+//                 }).toList(),
+//                 onChanged: (String? newValue) {
+//                   // Change function parameter to nullable string
+//                   setState(() {
+//                     _selectedOption = newValue;
+//                   });
+//                 },
+//               ),
+//               MessageStream()
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+//
+// class MessageStream extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder(
+//         stream: _firestore.collection('Event Request').snapshots(),
+//         builder: (context, snapshot) {
+//           if (!snapshot.hasData) {
+//             return const Center(
+//               child: CircularProgressIndicator(
+//                 backgroundColor: Colors.lightBlueAccent,
+//               ),
+//             );
+//           }
+//           final events = snapshot.data?.docs.reversed;
+//           List<EventCard> EventRequests = [];
+//           for (var event in events!) {
+//             // final messageText = message.data()['text'];
+//             // final messageSender = message.data()['sender'];
+//             final eventCard = EventCard(
+//                 eventTitle: event.data()['Event Name'],
+//                 eventId: event.data()['ID'].toString(),
+//                 date: event.data()['Date'],
+//                 student: event.data()['Generated User'],
+//                 eventstatus: event.data()['Status'],
+//                 nextpage: Administrator_event_details(
+//                   status: event.data()['Status'],
+//                   name: event.data()['Event Name'],
+//                   id: event.data()['ID'].toString(),
+//                   date: event.data()['Date'],
+//                   student: event.data()['Generated User'],
+//                   eventStartTime: event.data()['Event Start Time'],
+//                   eventEndTime: event.data()['Event End Time'],
+//                   venue: event.data()['Venue'],
+//                   description: event.data()['Event Description'],
+//                   facultiesInvolved: event.data()['FacultIies Involved'],
+//                   userType: event.data()['User Type'],
+//                   docID: event.id,
+//                   reason: event.data()['Reason For Removal'],
+//                   rejectedUser: event.data()['Rejected User'],
+//                 ),
+//                 context: context);
+//             EventRequests.add(eventCard);
+//           }
+//           return Expanded(
+//             child: ListView(
+//               padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10),
+//               children: EventRequests,
+//             ),
+//           );
+//         });
+//   }
+// }
+//
+// class EventCard extends StatelessWidget {
+//   EventCard(
+//       {required this.eventTitle,
+//       required this.eventId,
+//       required this.date,
+//       required this.student,
+//       required this.eventstatus,
+//       required this.nextpage,
+//       required BuildContext context});
+//   final String eventTitle;
+//   final String eventId;
+//   final String date;
+//   final String student;
+//   final String eventstatus;
+//   final Widget nextpage;
+//
+//   Color calStatusColour(String eventstatus) {
+//     if (eventstatus == 'ADMIN ACCEPTED') {
+//       return Colors.green;
+//     } else if (eventstatus == 'ONGOING') {
+//       return Colors.blue;
+//     } else if (eventstatus == 'REJECTED') {
+//       return Colors.red;
+//     } else if (eventstatus == 'FINAL ACCEPT RECEIVED') {
+//       return Colors.greenAccent;
+//     } else {
+//       return Colors.black38;
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () {
+//         Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+//           builder: (context) => nextpage,
+//         ));
+//       },
+//       child: Padding(
+//         padding: const EdgeInsets.fromLTRB(0, 0, 0, 13),
+//         child: Container(
+//           width: double.infinity,
+//           decoration: BoxDecoration(
+//             borderRadius: BorderRadius.circular(15),
+//             color: Color(0xFFFAFAFA),
+//             border: Border.all(
+//               color: Colors.grey,
+//               width: 0.4,
+//             ),
+//             boxShadow: [
+//               BoxShadow(
+//                   color: Color(0x13000000),
+//                   blurRadius: 5,
+//                   spreadRadius: 1,
+//                   offset: Offset(0, 5)),
+//             ],
+//           ),
+//           margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+//           child: Row(
+//             children: [
+//               SizedBox(
+//                 width: 20,
+//               ),
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   SizedBox(
+//                     height: 20,
+//                   ),
+//                   Text(
+//                     eventTitle,
+//                     style: TextStyle(
+//                       fontWeight: FontWeight.w700,
+//                       fontSize: 22,
+//                     ),
+//                   ),
+//                   SizedBox(
+//                     height: 7,
+//                   ),
+//                   Text(
+//                     'ID   ' + eventId,
+//                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+//                   ),
+//                   SizedBox(
+//                     height: 7,
+//                   ),
+//                   Row(
+//                     children: [
+//                       Icon(
+//                         Icons.date_range,
+//                         size: 20,
+//                       ),
+//                       SizedBox(
+//                         width: 10,
+//                       ),
+//                       Text(
+//                         date,
+//                         style: TextStyle(
+//                             fontWeight: FontWeight.w600, fontSize: 17),
+//                       ),
+//                     ],
+//                   ),
+//                   SizedBox(
+//                     height: 7,
+//                   ),
+//                   Row(
+//                     children: [
+//                       Icon(
+//                         Icons.man,
+//                         size: 20,
+//                       ),
+//                       SizedBox(
+//                         width: 10,
+//                       ),
+//                       Text(
+//                         student,
+//                         style: TextStyle(
+//                             fontWeight: FontWeight.w600, fontSize: 17),
+//                       ),
+//                     ],
+//                   ),
+//                   SizedBox(
+//                     height: 15,
+//                   ),
+//                   Text(
+//                     textAlign: TextAlign.center,
+//                     eventstatus,
+//                     style: TextStyle(
+//                         fontWeight: FontWeight.w800,
+//                         fontSize: 20,
+//                         color: calStatusColour(eventstatus)),
+//                   ),
+//                   SizedBox(
+//                     height: 11,
+//                   )
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

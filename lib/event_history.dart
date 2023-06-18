@@ -305,6 +305,11 @@ class MessageStream extends StatelessWidget {
                     .contains(searchText.toLowerCase()) ||
                 event
                     .data()['ID']
+                    .toString()
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                event
+                    .data()['Date']
                     .toLowerCase()
                     .contains(searchText.toLowerCase()) ||
                 event

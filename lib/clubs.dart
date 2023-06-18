@@ -400,6 +400,7 @@ class _AddClubScreenState extends State<AddClubScreen> {
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
+                                Navigator.pop(context);
                               },
                               child: Container(
                                 padding: EdgeInsets.all(10),
