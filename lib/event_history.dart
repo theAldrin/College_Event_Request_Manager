@@ -27,10 +27,25 @@ class _Event_historyState extends State<Event_history> {
     }
   }
 
+  var admins, students, faculties;
+
+  void getData() async {
+    var admins1 =
+        await _firestore.collection("Administrator User Details").get();
+    var faculties1 = await _firestore.collection("Faculty User Details").get();
+    var students1 = await _firestore.collection("Student User Details").get();
+    setState(() {
+      admins = admins1;
+      faculties = faculties1;
+      students = students1;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
+    getData();
   }
 
   Widget _title() {
@@ -213,6 +228,11 @@ class _Event_historyState extends State<Event_history> {
               MessageStream(
                 userType: widget.userType,
                 searchText: _searchText,
+                selectedStatus: _selectedStatus.toString(),
+                selectedUserType: _selectedUserType.toString(),
+                students: students,
+                faculties: faculties,
+                admins: admins,
               ),
             ],
           ),
@@ -222,10 +242,46 @@ class _Event_historyState extends State<Event_history> {
   }
 }
 
+String generatedUserName(
+    String type, String mail, var admins, var faculties, var students) {
+  if (admins != null && faculties != null && students != null) {
+    if (type == 'ADMINISTRATOR') {
+      for (var admin in admins.docs) {
+        if (admin.data()['Email'] == mail) {
+          return admin.data()['Name'];
+        }
+      }
+    } else if (type == 'FACULTY') {
+      for (var faculty in faculties.docs) {
+        if (faculty.data()['Email'] == mail) {
+          return faculty.data()['Name'];
+        }
+      }
+    } else if (type == 'STUDENT') {
+      for (var student in students.docs) {
+        if (student.data()['Email'] == mail) {
+          return student.data()['Name'];
+        }
+      }
+    }
+    return '';
+  } else {
+    return '';
+  }
+}
+
 class MessageStream extends StatelessWidget {
-  MessageStream({required this.userType, required this.searchText});
+  MessageStream(
+      {required this.userType,
+      required this.searchText,
+      required this.selectedStatus,
+      required this.selectedUserType,
+      required this.students,
+      required this.faculties,
+      required this.admins});
   String userType;
-  final String searchText;
+  final String searchText, selectedUserType, selectedStatus;
+  var students, faculties, admins;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -244,48 +300,74 @@ class MessageStream extends StatelessWidget {
             // final messageText = message.data()['text'];
             // final messageSender = message.data()['sender'];
             if (event
-                .data()['Event Name']
-                .toLowerCase()
-                .contains(searchText.toLowerCase())) {
-              bool flag = false;
-              for (String facultyMails in event.data()['FacultIies Involved']) {
-                if ((loggedInUser.email == facultyMails) &&
-                    (event.data()['FacultIies Involved'].last !=
-                        facultyMails)) {
-                  flag = true;
+                    .data()['Event Name']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                event
+                    .data()['ID']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                event
+                    .data()['Generated User']
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase())) {
+              if ((selectedStatus == 'ALL') ||
+                  (selectedStatus == event.data()['Status'])) {
+                if ((selectedUserType == 'ALL') ||
+                    ((selectedUserType == 'MY EVENTS') &&
+                        (event.data()['Generated User'] ==
+                            loggedInUser.email)) ||
+                    ((selectedUserType == 'OTHERS EVENTS') &&
+                        (event.data()['Generated User'] !=
+                            loggedInUser.email))) {
+                  bool flag = false;
+                  for (String facultyMails
+                      in event.data()['FacultIies Involved']) {
+                    if ((loggedInUser.email == facultyMails) &&
+                        (event.data()['FacultIies Involved'].last !=
+                            facultyMails)) {
+                      flag = true;
+                    }
+                    if ((event.data()['Status'] != 'ONGOING') &&
+                        (event.data()['FacultIies Involved'].last ==
+                            facultyMails) &&
+                        (loggedInUser.email == facultyMails)) {
+                      flag = true;
+                    }
+                  }
+                  if (loggedInUser.email == event.data()['Generated User'] ||
+                      flag) {
+                    final eventCard = EventCard(
+                        eventTitle: event.data()['Event Name'],
+                        eventId: event.data()['ID'].toString(),
+                        date: event.data()['Date'],
+                        student: generatedUserName(
+                            event.data()['User Type'],
+                            event.data()['Generated User'],
+                            admins,
+                            faculties,
+                            students),
+                        eventstatus: event.data()['Status'],
+                        nextpage: Student_Faculty_event_details(
+                          name: event.data()['Event Name'],
+                          id: event.data()['ID'].toString(),
+                          date: event.data()['Date'],
+                          student: event.data()['Generated User'],
+                          eventStartTime: event.data()['Event Start Time'],
+                          eventEndTime: event.data()['Event End Time'],
+                          venue: event.data()['Venue'],
+                          description: event.data()['Event Description'],
+                          facultiesInvolved:
+                              event.data()['FacultIies Involved'],
+                          status: event.data()['Status'],
+                          userType: event.data()['User Type'],
+                          reason: event.data()['Reason For Removal'],
+                          rejectedUser: event.data()['Rejected User'],
+                        ),
+                        context: context);
+                    EventRequests.add(eventCard);
+                  }
                 }
-                if ((event.data()['Status'] != 'ONGOING') &&
-                    (event.data()['FacultIies Involved'].last ==
-                        facultyMails) &&
-                    (loggedInUser.email == facultyMails)) {
-                  flag = true;
-                }
-              }
-              if (loggedInUser.email == event.data()['Generated User'] ||
-                  flag) {
-                final eventCard = EventCard(
-                    eventTitle: event.data()['Event Name'],
-                    eventId: event.data()['ID'].toString(),
-                    date: event.data()['Date'],
-                    student: event.data()['Generated User'],
-                    eventstatus: event.data()['Status'],
-                    nextpage: Student_Faculty_event_details(
-                      name: event.data()['Event Name'],
-                      id: event.data()['ID'].toString(),
-                      date: event.data()['Date'],
-                      student: event.data()['Generated User'],
-                      eventStartTime: event.data()['Event Start Time'],
-                      eventEndTime: event.data()['Event End Time'],
-                      venue: event.data()['Venue'],
-                      description: event.data()['Event Description'],
-                      facultiesInvolved: event.data()['FacultIies Involved'],
-                      status: event.data()['Status'],
-                      userType: event.data()['User Type'],
-                      reason: event.data()['Reason For Removal'],
-                      rejectedUser: event.data()['Rejected User'],
-                    ),
-                    context: context);
-                EventRequests.add(eventCard);
               }
             }
           }

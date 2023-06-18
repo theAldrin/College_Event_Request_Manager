@@ -31,7 +31,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
       name = '',
       status = '',
       userType = '';
-  late List<dynamic> facultiesInvolved = [];
+  late List<dynamic> facultiesInvolved = [], requiredFaculties = [];
 
   void getCurrentUser() async {
     try {
@@ -61,13 +61,15 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
       facultiesInvolved = event.data()?['FacultIies Involved'];
       status = event.data()?['Status'];
       userType = event.data()?['User Type'];
+      requiredFaculties = event.data()?['Required Faculties'];
     });
   }
 
+  var faculties;
   void getallFaculties() async {
     final facultyData =
         await _firestore.collection('Faculty User Details').get();
-    final faculties = facultyData.docs;
+    faculties = facultyData.docs;
     for (var faculty in faculties) {
       if ((faculty.data()['Email'] != loggedInUser.email)) {
         setState(() {
@@ -76,6 +78,33 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
       }
     }
   }
+
+  String facultyNameFromMailString(String facultyMail) {
+    for (var faculty1 in faculties) {
+      if (faculty1.data()['Email'] == facultyMail) {
+        return faculty1.data()['Name'].toString();
+      }
+    }
+    return '';
+  }
+
+  bool checkRequiredFaculties() {
+    bool flag = true;
+    List<String> stringFacultiesInvolved =
+        facultiesInvolved.map((dynamic item) => item.toString()).toList();
+    for (String fac in requiredFaculties) {
+      if (!stringFacultiesInvolved.contains(fac)) {
+        setState(() {
+          facultiesNotInFacultiesInvolved +=
+              ('${facultyNameFromMailString(fac)}  ($fac)\n');
+        });
+        flag = false;
+      }
+    }
+    return flag;
+  }
+
+  String facultiesNotInFacultiesInvolved = '';
 
   @override
   void initState() {
@@ -172,7 +201,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
                           child: Container(
                             padding: EdgeInsets.all(10),
                             child: Text(
-                              'REJECT',
+                              'OK',
                               style: TextStyle(color: Colors.white),
                             ),
                             color: Colors.black,
@@ -336,95 +365,123 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
               color: Color(0xfff7892b),
               child: InkWell(
                 onTap: () {
-                  // Action to perform when the button is pressed
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('ATTENTION !!!'),
-                        content: Text(
-                            'Are you sure you have the authority to give final accept this event request'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text(
-                                        'Do you want to give final accept to this event Request'),
-                                    //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () async {
-                                          final data = {
-                                            "Status": 'FINAL FACULTY ACCEPTED',
-                                          };
-                                          _firestore
-                                              .collection("Event Request")
-                                              .doc(widget.eventDocumentID)
-                                              .set(data,
-                                                  SetOptions(merge: true));
-                                          Navigator.pop(context);
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text(
-                                                    'Final accept for the event is provided'),
-                                                //content: Text('Are you sure you have the authority to give final accept this event request'),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(10),
-                                                      child: Text(
-                                                        'OK',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
+                  if (checkRequiredFaculties()) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('ATTENTION !!!'),
+                          content: Text(
+                              'Are you sure you have the authority to give final accept this event request'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                          'Do you want to give final accept to this event Request'),
+                                      //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () async {
+                                            final data = {
+                                              "Status":
+                                                  'FINAL FACULTY ACCEPTED',
+                                            };
+                                            _firestore
+                                                .collection("Event Request")
+                                                .doc(widget.eventDocumentID)
+                                                .set(data,
+                                                    SetOptions(merge: true));
+                                            Navigator.pop(context);
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text(
+                                                      'Final accept for the event is provided'),
+                                                  //content: Text('Are you sure you have the authority to give final accept this event request'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.all(10),
+                                                        child: Text(
+                                                          'OK',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        color: Colors.black,
                                                       ),
-                                                      color: Colors.black,
                                                     ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(10),
-                                          child: Text(
-                                            'YES',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              'YES',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            color: Colors.black,
                                           ),
-                                          color: Colors.black,
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                'YES',
-                                style: TextStyle(color: Colors.white),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'YES',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
                               ),
-                              color: Colors.black,
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                              'You cannot give final accept for this event Please forward this to any of the faculties mentioned below'),
+                          content: Text(facultiesNotInFacultiesInvolved),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),

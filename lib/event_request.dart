@@ -25,8 +25,8 @@ class _Event_requestState extends State<Event_request> {
       description = '',
       club = 'NONE';
   List<String> venuesList = ['OUTSIDE CAMPUS'];
-  List<String> facultyList = ['ADMINISTRATOR'];
-  String? venue = 'OUTSIDE CAMPUS', faculty = 'ADMINISTRATOR';
+  List<String> facultyList = ['Select'];
+  String? venue = 'OUTSIDE CAMPUS', faculty = 'Select';
 
   void getCurrentUser() async {
     try {
