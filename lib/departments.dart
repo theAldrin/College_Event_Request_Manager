@@ -263,10 +263,10 @@ class AddDepartmentScreen extends StatefulWidget {
 }
 
 class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
-  late String clubName, HODMail = 'NONE', HODName = 'NONE';
+  late String clubName, HODMail = 'Select', HODName = 'Select';
 
-  List<String> facultyNameList = ['NONE'];
-  List<String> facultyEmailList = ['NONE'];
+  List<String> facultyNameList = ['Select'];
+  List<String> facultyEmailList = ['Select'];
 
   void getallFaculties() async {
     final facultyData =
