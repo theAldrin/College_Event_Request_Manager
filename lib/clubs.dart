@@ -265,11 +265,11 @@ class AddClubScreen extends StatefulWidget {
 
 class _AddClubScreenState extends State<AddClubScreen> {
   late String clubName,
-      facultyAdvisorMail = 'NONE',
-      facultyAdvisorName = 'NONE';
+      facultyAdvisorMail = 'Select',
+      facultyAdvisorName = 'Select';
 
-  List<String> facultyNameList = ['NONE'];
-  List<String> facultyEmailList = ['NONE'];
+  List<String> facultyNameList = ['Select'];
+  List<String> facultyEmailList = ['Select'];
 
   void getallFaculties() async {
     final facultyData =
