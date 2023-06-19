@@ -24,8 +24,8 @@ class _Department_detail_editState extends State<Department_detail_edit> {
     });
   }
 
-  List<String> facultyNameList = ['NONE'];
-  List<String> facultyEmailList = ['NONE'];
+  List<String> facultyNameList = ['Select'];
+  List<String> facultyEmailList = ['Select'];
 
   void getallFaculties() async {
     final facultyData =
@@ -86,7 +86,7 @@ class _Department_detail_editState extends State<Department_detail_edit> {
   }
 
   //String? _selectedOption = 'STUDENT';
-  late String name = '', hodMail = 'NONE', hodName = 'NONE';
+  late String name = '', hodMail = 'Select', hodName = 'Select';
 
   @override
   Widget build(BuildContext context) {
