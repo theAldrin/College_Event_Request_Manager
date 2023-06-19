@@ -90,7 +90,9 @@ class _Facluty_homeState extends State<Facluty_home> {
             userType: 'FACULTY',
           ),
           Pending_events(),
-          Calendar()
+          Calendar(
+            userType: 'STUDENTFACULTY',
+          )
         ],
       ),
       extendBody: true,

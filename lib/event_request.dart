@@ -25,8 +25,9 @@ class _Event_requestState extends State<Event_request> {
       description = '',
       club = 'NONE';
   List<String> venuesList = ['OUTSIDE CAMPUS'];
-  List<String> facultyList = ['Select'];
-  String? venue = 'OUTSIDE CAMPUS', faculty = 'Select';
+  String? venue = 'OUTSIDE CAMPUS',
+      associatedFacultyName = 'Select',
+      associatedFacultyMail = 'Select';
 
   void getCurrentUser() async {
     try {
@@ -49,17 +50,41 @@ class _Event_requestState extends State<Event_request> {
     }
   }
 
+  List<String> facultyNameList = ['Select'];
+  List<String> facultyEmailList = ['Select'];
+
   void getallFaculties() async {
     final facultyData =
         await _firestore.collection('Faculty User Details').get();
     final faculties = facultyData.docs;
     for (var faculty1 in faculties) {
-      if ((faculty1.data()['Email'] != loggedInUser.email)) {
-        setState(() {
-          facultyList.add(faculty1.data()['Email']);
-        });
+      setState(() {
+        facultyEmailList.add(faculty1.data()['Email']);
+        facultyNameList.add(faculty1.data()['Name']);
+      });
+    }
+  }
+
+  Widget facultyNameFromMailWidget(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return Text(facultyNameList[i]);
       }
     }
+    return Text('');
+  }
+
+  String facultyNameFromMailString(String facultyMail) {
+    int i = -1;
+    for (String facultyMail1 in facultyEmailList) {
+      i++;
+      if (facultyMail1 == facultyMail) {
+        return facultyNameList[i];
+      }
+    }
+    return ' ';
   }
 
   List<String> clubsList = ['NONE'];
@@ -453,19 +478,21 @@ class _Event_requestState extends State<Event_request> {
                     DropdownButton<String>(
                       isExpanded: true,
                       iconEnabledColor: Color(0xfff7892b),
-                      iconSize: 35,
-                      value: faculty,
-                      items: facultyList
+                      iconSize: 60,
+                      value: associatedFacultyMail,
+                      items: facultyEmailList
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: facultyNameFromMailWidget(value),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
                         // Change function parameter to nullable string
                         setState(() {
-                          faculty = newValue;
+                          associatedFacultyMail = newValue!;
+                          associatedFacultyName =
+                              facultyNameFromMailString(associatedFacultyMail!);
                         });
                       },
                     ),
@@ -595,7 +622,9 @@ class _Event_requestState extends State<Event_request> {
                                           'Event End Time': formattedEndTime,
                                           'Venue': venue,
                                           'Event Description': description,
-                                          'FacultIies Involved': [faculty],
+                                          'FacultIies Involved': [
+                                            associatedFacultyMail
+                                          ],
                                           'Generated User': loggedInUser.email,
                                           'Status': 'ONGOING',
                                           'TimeStamp':

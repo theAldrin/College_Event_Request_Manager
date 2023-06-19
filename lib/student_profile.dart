@@ -121,7 +121,34 @@ class _Student_ProfileState extends State<Student_Profile> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: 50,
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: Colors.black54,
+                    size: 30,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Student_profile_edit(),
+                          ));
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black54,
+                      size: 30,
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20,
               ),
               CircleAvatar(
                 radius: 50.0,

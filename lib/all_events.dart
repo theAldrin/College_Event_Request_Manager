@@ -140,11 +140,12 @@ class _All_eventsState extends State<All_events> {
                             value: _selectedStatus,
                             items: <String>[
                               'ALL',
-                              'ADMIN ACCEPTED',
                               'ONGOING',
-                              'REJECTED',
                               'FINAL FACULTY ACCEPTED',
-                              'COMPLETED'
+                              'ADMIN ACCEPTED',
+                              'COMPLETED',
+                              'REJECTED',
+                              'WITHDRAWN'
                             ].map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
@@ -333,20 +334,7 @@ class MessageStream extends StatelessWidget {
                           students),
                       eventstatus: event.data()['Status'],
                       nextpage: Administrator_event_details(
-                        name: event.data()['Event Name'],
-                        id: event.data()['ID'].toString(),
-                        date: event.data()['Date'],
-                        student: event.data()['Generated User'],
-                        eventStartTime: event.data()['Event Start Time'],
-                        eventEndTime: event.data()['Event End Time'],
-                        venue: event.data()['Venue'],
-                        description: event.data()['Event Description'],
-                        facultiesInvolved: event.data()['FacultIies Involved'],
-                        status: event.data()['Status'],
-                        userType: event.data()['User Type'],
-                        reason: event.data()['Reason For Removal'],
-                        rejectedUser: event.data()['Rejected User'],
-                        docID: event.id,
+                        docId: event.id,
                       ),
                       context: context);
                   EventRequests.add(eventCard);

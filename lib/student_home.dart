@@ -89,7 +89,9 @@ class _Student_homeState extends State<Student_home> {
           Event_request(
             userType: 'STUDENT',
           ),
-          Calendar()
+          Calendar(
+            userType: 'STUDENTFACULTY',
+          )
         ],
       ),
       extendBody: true,

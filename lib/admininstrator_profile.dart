@@ -52,42 +52,6 @@ class _Administrator_profileState extends State<Administrator_profile> {
     getData();
   }
 
-  Widget _submitButton() {
-    if (currentUserEmail == widget.adminMail) {
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Administrator_profile_edit(),
-              ));
-        },
-        child: Container(
-          margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(vertical: 15),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-              // boxShadow: <BoxShadow>[
-              //   BoxShadow(
-              //       color: Colors.grey.shade900,
-              //       offset: Offset(2, 4),
-              //       blurRadius: 5,
-              //       spreadRadius: 2)
-              // ],
-              color: Color(0xFF000000)),
-          child: Text(
-            'EDIT',
-            style: TextStyle(fontSize: 20, color: Colors.white),
-          ),
-        ),
-      );
-    } else {
-      return Text('');
-    }
-  }
-
   String name = '', college = '', email = '', phoneno = '';
 
   @override
@@ -101,7 +65,34 @@ class _Administrator_profileState extends State<Administrator_profile> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: 50,
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: Colors.black54,
+                    size: 30,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Administrator_profile_edit(),
+                          ));
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black54,
+                      size: 30,
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20,
               ),
               CircleAvatar(
                 radius: 50.0,
@@ -148,7 +139,6 @@ class _Administrator_profileState extends State<Administrator_profile> {
               SizedBox(
                 height: 50,
               ),
-              _submitButton()
             ],
           ),
         )),

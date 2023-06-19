@@ -109,7 +109,9 @@ class _Event_historyState extends State<Event_history> {
               ),
               SizedBox(height: 18),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: widget.userType == 'FACULTY'
+                    ? MainAxisAlignment.spaceEvenly
+                    : MainAxisAlignment.center,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,11 +143,12 @@ class _Event_historyState extends State<Event_history> {
                             value: _selectedStatus,
                             items: <String>[
                               'ALL',
-                              'ADMIN ACCEPTED',
                               'ONGOING',
-                              'REJECTED',
                               'FINAL FACULTY ACCEPTED',
-                              'COMPLETED'
+                              'ADMIN ACCEPTED',
+                              'COMPLETED',
+                              'REJECTED',
+                              'WITHDRAWN'
                             ].map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
@@ -168,60 +171,63 @@ class _Event_historyState extends State<Event_history> {
                       ),
                     ],
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
-                        child: Text(
-                          'USER',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.9,
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 1),
-                          child: DropdownButton<String>(
-                            //isExpanded: true,
-                            iconEnabledColor: Color(0xfff7892b),
-                            iconSize: 25,
-                            underline: SizedBox(),
-                            value: _selectedUserType,
-                            items: <String>[
-                              'ALL',
-                              'MY EVENTS',
-                              'OTHERS EVENTS',
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500),
+                  widget.userType == 'FACULTY'
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                              child: Text(
+                                'USER',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 0.9,
                                 ),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              // Change function parameter to nullable string
-                              setState(() {
-                                _selectedUserType = newValue;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 1),
+                                child: DropdownButton<String>(
+                                  //isExpanded: true,
+                                  iconEnabledColor: Color(0xfff7892b),
+                                  iconSize: 25,
+                                  underline: SizedBox(),
+                                  value: _selectedUserType,
+                                  items: <String>[
+                                    'ALL',
+                                    'MY EVENTS',
+                                    'OTHERS EVENTS',
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    // Change function parameter to nullable string
+                                    setState(() {
+                                      _selectedUserType = newValue;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(''),
                 ],
               ),
               SizedBox(height: 10),
@@ -354,20 +360,7 @@ class MessageStream extends StatelessWidget {
                             students),
                         eventstatus: event.data()['Status'],
                         nextpage: Student_Faculty_event_details(
-                          name: event.data()['Event Name'],
-                          id: event.data()['ID'].toString(),
-                          date: event.data()['Date'],
-                          student: event.data()['Generated User'],
-                          eventStartTime: event.data()['Event Start Time'],
-                          eventEndTime: event.data()['Event End Time'],
-                          venue: event.data()['Venue'],
-                          description: event.data()['Event Description'],
-                          facultiesInvolved:
-                              event.data()['FacultIies Involved'],
-                          status: event.data()['Status'],
-                          userType: event.data()['User Type'],
-                          reason: event.data()['Reason For Removal'],
-                          rejectedUser: event.data()['Rejected User'],
+                          docId: event.id,
                         ),
                         context: context);
                     EventRequests.add(eventCard);

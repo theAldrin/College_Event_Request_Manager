@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/student_profile_edit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'faculty_profile_edit.dart';
@@ -111,7 +112,34 @@ class _Faculty_profileState extends State<Faculty_profile> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: 50,
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: Colors.black54,
+                    size: 30,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Faculty_profile_edit(),
+                          ));
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black54,
+                      size: 30,
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 20,
               ),
               CircleAvatar(
                 radius: 50.0,

@@ -47,6 +47,20 @@ class _Add_InfoState extends State<Add_Info> {
                 child: ListView(
                   children: [
                     InfoCard(
+                      infoType: 'Calendar',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Calendar(
+                              userType:
+                                  'ADMINISTRATOR', //TODO:CHANGE THIS TO INCORPARATE VARIOUS USERS
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    InfoCard(
                       infoType: 'Venues',
                       onPressed: () {
                         Navigator.push(
@@ -79,17 +93,6 @@ class _Add_InfoState extends State<Add_Info> {
                         );
                       },
                     ),
-                    InfoCard(
-                      infoType: 'Calendar',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Calendar(),
-                          ),
-                        );
-                      },
-                    )
                   ],
                 ),
               ),
@@ -119,14 +122,14 @@ class InfoCard extends StatelessWidget {
             color: Color(0xFFFAFAFA),
             border: Border.all(
               color: Colors.grey,
-              width: 0.4,
+              width: 0.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0x13000000),
+                color: Color(0x0f000000),
                 blurRadius: 5,
                 spreadRadius: 1,
-                offset: Offset(0, 5),
+                offset: Offset(0, 1),
               ),
             ],
           ),

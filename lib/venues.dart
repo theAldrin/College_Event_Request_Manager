@@ -343,7 +343,7 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
   @override
   void initState() {
     super.initState();
-    getAdmin();
+    //getAdmin();
     getallFaculties();
   }
 

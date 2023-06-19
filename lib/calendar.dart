@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/administrator_event_details.dart';
+import 'package:event_consent2/student_faculty_event_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class Calendar extends StatefulWidget {
-  const Calendar({super.key});
+  Calendar({required this.userType});
+  String userType;
 
   @override
   State<Calendar> createState() => _CalendarState();
@@ -34,14 +37,17 @@ class _CalendarState extends State<Calendar> {
       debugShowCheckedModeBanner: false,
       home: AppointmentDetails(
         events: events,
+        userType: widget.userType,
       ),
     );
   }
 }
 
 class AppointmentDetails extends StatefulWidget {
-  AppointmentDetails({super.key, @required this.events});
+  AppointmentDetails(
+      {super.key, @required this.events, required this.userType});
   var events;
+  String userType;
   @override
   State<StatefulWidget> createState() => ScheduleExample();
 }
@@ -95,7 +101,11 @@ class ScheduleExample extends State<AppointmentDetails> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => SecondRoute(appointment: appointment)),
+            builder: (context) => widget.userType == 'ADMINISTRATOR'
+                ? Administrator_event_details(
+                    docId: appointment.notes as String)
+                : Student_Faculty_event_details(
+                    docId: appointment.notes as String)),
       );
     }
   }
@@ -115,6 +125,7 @@ class ScheduleExample extends State<AppointmentDetails> {
       for (var event in widget.events) {
         print(event.data()['Event Name']);
         appointments.add(Appointment(
+          notes: event.id,
           startTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
               '${formatString(event.data()['Date']) + ' ' + event.data()['Event Start Time']}:00'),
           endTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(

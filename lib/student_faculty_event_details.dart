@@ -8,34 +8,9 @@ import 'faculty_profile.dart';
 dynamic loggedInUser;
 
 class Student_Faculty_event_details extends StatefulWidget {
-  Student_Faculty_event_details(
-      {required this.name,
-      required this.id,
-      required this.date,
-      required this.student,
-      required this.eventStartTime,
-      required this.eventEndTime,
-      required this.venue,
-      required this.description,
-      required this.facultiesInvolved,
-      required this.status,
-      required this.userType,
-      required this.reason,
-      required this.rejectedUser});
-  final String id,
-      date,
-      student,
-      eventStartTime,
-      eventEndTime,
-      venue,
-      description,
-      name,
-      status,
-      userType,
-      reason,
-      rejectedUser;
-  final List<dynamic> facultiesInvolved;
+  Student_Faculty_event_details({required this.docId});
 
+  final String docId;
   @override
   State<Student_Faculty_event_details> createState() =>
       _Student_Faculty_event_detailsState();
@@ -60,17 +35,51 @@ class _Student_Faculty_event_detailsState
     }
   }
 
+  String id = ' ',
+      date = ' ',
+      student = ' ',
+      eventStartTime = ' ',
+      eventEndTime = ' ',
+      venue = ' ',
+      description = ' ',
+      name = ' ',
+      status = ' ',
+      userType = ' ',
+      reason = ' ',
+      rejectedUser = ' ';
+  List<dynamic> facultiesInvolved = [' '];
+  void getDetails() async {
+    final event =
+        await _firestore.collection("Event Request").doc(widget.docId).get();
+    setState(() {
+      id = event.data()!['ID'].toString();
+      date = event.data()?['Date'];
+      student = event.data()?['Generated User'];
+      eventStartTime = event.data()?['Event Start Time'];
+      eventEndTime = event.data()?['Event End Time'];
+      venue = event.data()?['Venue'];
+      description = event.data()?['Event Description'];
+      name = event.data()?['Event Name'];
+      status = event.data()?['Status'];
+      userType = event.data()?['User Type'];
+      reason = event.data()?['Reason For Removal'];
+      rejectedUser = event.data()?['Rejected User'];
+      facultiesInvolved = event.data()?['FacultIies Involved'];
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
+    getDetails();
   }
 
   Widget _title() {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: widget.name,
+        text: name,
         style: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w700,
@@ -94,23 +103,23 @@ class _Student_Faculty_event_detailsState
                   width: double.infinity,
                 ),
                 Event_Detail_Column(
-                  status: widget.status,
-                  id: widget.id,
-                  date: widget.date,
-                  student: widget.student,
-                  event_start_time: widget.eventStartTime,
-                  event_end_time: widget.eventEndTime,
-                  venue: widget.venue,
-                  description: widget.description,
-                  faculties_involved: widget.facultiesInvolved,
-                  isCompleted: (widget.status == 'ADMIN ACCEPTED' ||
-                          widget.status == 'COMPLETED' ||
-                          widget.status == 'FINAL FACULTY ACCEPTED')
+                  status: status,
+                  id: id,
+                  date: date,
+                  student: student,
+                  event_start_time: eventStartTime,
+                  event_end_time: eventEndTime,
+                  venue: venue,
+                  description: description,
+                  faculties_involved: facultiesInvolved,
+                  isCompleted: (status == 'ADMIN ACCEPTED' ||
+                          status == 'COMPLETED' ||
+                          status == 'FINAL FACULTY ACCEPTED')
                       ? true
                       : false,
-                  userType: widget.userType,
-                  reason: widget.reason,
-                  rejectedUser: widget.rejectedUser,
+                  userType: userType,
+                  reason: reason,
+                  rejectedUser: rejectedUser,
                 )
               ]),
         ),
@@ -160,7 +169,10 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
   late String newReason;
 
   Widget _RequestWithdrawButton(BuildContext context) {
-    if (widget.status != 'COMPLETED' && loggedInUser.email == widget.student) {
+    if ((widget.status == 'ONGOING' ||
+            widget.status == 'FINAL FACULTY ACCEPTED' ||
+            widget.status == 'ADMIN ACCEPTED') &&
+        loggedInUser.email == widget.student) {
       return TextButton(
         onPressed: () async {
           final eventData = await _firestore.collection('Event Request').get();

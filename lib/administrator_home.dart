@@ -82,15 +82,14 @@ class _Administrator_homeState extends State<Administrator_home> {
       body: PageView(
         controller: _controller,
         children: <Widget>[
-          Administrator_profile(
-            adminMail: currentUserEmail,
-          ),
           All_events(),
           Event_request(
             userType: 'ADMINISTRATOR',
           ),
           Add_Info(),
-          Calendar()
+          Administrator_profile(
+            adminMail: currentUserEmail,
+          ),
         ],
       ),
       extendBody: true,
@@ -100,16 +99,14 @@ class _Administrator_homeState extends State<Administrator_home> {
         flat: false,
         useActiveColorByDefault: false,
         items: [
-          RollingBottomBarItem(Icons.person,
-              label: 'Profile', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.dock,
               label: 'All Events', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.add_box,
               label: 'Add Event', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.home_rounded,
               label: 'Info', activeColor: Color(0xfff3892b)),
-          RollingBottomBarItem(Icons.calendar_month,
-              label: 'Calendar', activeColor: Color(0xfff3892b)),
+          RollingBottomBarItem(Icons.person,
+              label: 'Profile', activeColor: Color(0xfff3892b)),
         ],
         enableIconRotation: true,
         onTap: (index) {
