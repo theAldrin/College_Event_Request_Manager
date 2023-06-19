@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/pending_events.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:rolling_bottom_bar/rolling_bottom_bar.dart';
 import 'package:rolling_bottom_bar/rolling_bottom_bar_item.dart';
 import 'calendar.dart';
@@ -14,6 +16,8 @@ class Facluty_home extends StatefulWidget {
   @override
   State<Facluty_home> createState() => _Facluty_homeState();
 }
+
+final _firestore = FirebaseFirestore.instance;
 
 class _Facluty_homeState extends State<Facluty_home> {
   final _auth = FirebaseAuth.instance;
@@ -32,10 +36,34 @@ class _Facluty_homeState extends State<Facluty_home> {
     }
   }
 
+  String formatString(String input) {
+    List<String> parts = input.split('-'); // Split the input string by hyphens
+    List<String> reversedParts =
+        parts.reversed.toList(); // Reverse the order of the parts
+    return reversedParts.join(
+        '-'); // Join the reversed parts with hyphens and return the result
+  }
+
+  void updateEventStatusOfCompletedEvents() async {
+    final events1 = await _firestore.collection("Event Request").get();
+    for (var event in events1.docs) {
+      DateTime eventEndTime = DateFormat("yyyy-MM-dd hh:mm:ss").parse(
+          '${formatString(event.data()['Date']) + ' ' + event.data()['Event End Time']}:00');
+      if (DateTime.now().isAfter(eventEndTime) &&
+          event.data()['Status'] == 'ADMIN ACCEPTED') {
+        await _firestore
+            .collection('Event Request')
+            .doc(event.id)
+            .update({'Status': 'COMPLETED'});
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
+    updateEventStatusOfCompletedEvents();
   }
 
   final _controller = PageController();
