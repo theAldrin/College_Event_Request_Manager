@@ -298,8 +298,8 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
       newVenueType = 'CLASS',
       newVenueDepartment = 'NONE',
       newVenueCapacity = '',
-      newVenueFacultyName = 'NONE',
-      newVenueFacultyMail = 'NONE';
+      newVenueFacultyName = 'Select',
+      newVenueFacultyMail = 'Select';
 
   List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
 
@@ -313,8 +313,8 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
     'CIVIL'
   ];
 
-  List<String> facultyNameList = ['NONE'];
-  List<String> facultyEmailList = ['NONE'];
+  List<String> facultyNameList = ['Select'];
+  List<String> facultyEmailList = ['Select'];
 
   void getallFaculties() async {
     final facultyData =
