@@ -26,8 +26,8 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
     });
   }
 
-  List<String> facultyNameList = ['NONE'];
-  List<String> facultyEmailList = ['NONE'];
+  List<String> facultyNameList = ['Select'];
+  List<String> facultyEmailList = ['Select'];
 
   void getallFaculties() async {
     final facultyData =
@@ -104,8 +104,8 @@ class _Venue_detail_editState extends State<Venue_detail_edit> {
       capacity = '',
       department = 'COMPUTER SCIENCE',
       name = '',
-      facultyName = 'NONE',
-      facultyEmail = 'NONE';
+      facultyName = 'Select',
+      facultyEmail = 'Select';
   List<String> venueTypes = ['CLASS', 'HALL', 'AUDITORIUM', 'OUTDOORS', 'LAB'];
 
   List<String> departments = [
