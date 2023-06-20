@@ -1,3 +1,4 @@
+import 'package:event_consent2/allFacultys.dart';
 import 'package:event_consent2/calendar.dart';
 import 'package:event_consent2/departments.dart';
 import 'package:event_consent2/venues.dart';
@@ -89,6 +90,17 @@ class _Add_InfoState extends State<Add_Info> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => Clubs(),
+                          ),
+                        );
+                      },
+                    ),
+                    InfoCard(
+                      infoType: 'Faculties',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => allFcaultys(),
                           ),
                         );
                       },
