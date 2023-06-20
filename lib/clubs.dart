@@ -6,8 +6,8 @@ import 'club_detail_edit.dart';
 import 'department_detail_edit.dart';
 
 class Clubs extends StatefulWidget {
-  const Clubs({Key? key}) : super(key: key);
-
+  Clubs({required this.userType});
+  String userType;
   @override
   State<Clubs> createState() => _ClubsState();
 }
@@ -68,26 +68,30 @@ class _ClubsState extends State<Clubs> {
                     margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
                     child: _title(),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => SingleChildScrollView(
-                            child: Container(
-                          padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom +
-                                  30),
-                          child: AddClubScreen(),
-                        )),
-                      );
-                    },
-                    child: Icon(
-                      Icons.add,
-                      size: 35,
-                      color: Color(0xffe46b10),
-                    ),
-                  )
+                  widget.userType == 'ADMINISTRATOR'
+                      ? TextButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) => SingleChildScrollView(
+                                  child: Container(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom +
+                                        30),
+                                child: AddClubScreen(),
+                              )),
+                            );
+                          },
+                          child: Icon(
+                            Icons.add,
+                            size: 35,
+                            color: Color(0xffe46b10),
+                          ),
+                        )
+                      : Container()
                 ],
               ),
               Padding(
@@ -125,6 +129,7 @@ class _ClubsState extends State<Clubs> {
               ),
               MessageStream(
                 searchText: _searchText,
+                userType: widget.userType,
               )
             ],
           ),
@@ -139,9 +144,10 @@ class ClubCard extends StatelessWidget {
       {required this.clubName,
       required this.facultyAdvisorName,
       required this.clubDocumentID,
-      required this.facultyAdvisorEmail});
+      required this.facultyAdvisorEmail,
+      required this.userType});
   String clubName;
-  String facultyAdvisorName, clubDocumentID, facultyAdvisorEmail;
+  String facultyAdvisorName, clubDocumentID, facultyAdvisorEmail, userType;
 
   @override
   Widget build(BuildContext context) {
@@ -213,43 +219,47 @@ class ClubCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Club_detail_edit(
-                              clubDocumentID: clubDocumentID,
+              userType == 'ADMINISTRATOR'
+                  ? Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Club_detail_edit(
+                                    clubDocumentID: clubDocumentID,
+                                  ),
+                                ));
+                          },
+                          child: Container(
+                            //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            width: 70,
+                            padding: EdgeInsets.symmetric(vertical: 7),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(6)),
+                                // boxShadow: <BoxShadow>[
+                                //   BoxShadow(
+                                //       color: Colors.grey.shade900,
+                                //       offset: Offset(2, 4),
+                                //       blurRadius: 5,
+                                //       spreadRadius: 2)
+                                // ],
+                                color: Color(0xFF000000)),
+                            child: Text(
+                              'EDIT',
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.white),
                             ),
-                          ));
-                    },
-                    child: Container(
-                      //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                      width: 70,
-                      padding: EdgeInsets.symmetric(vertical: 7),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
-                          // boxShadow: <BoxShadow>[
-                          //   BoxShadow(
-                          //       color: Colors.grey.shade900,
-                          //       offset: Offset(2, 4),
-                          //       blurRadius: 5,
-                          //       spreadRadius: 2)
-                          // ],
-                          color: Color(0xFF000000)),
-                      child: Text(
-                        'EDIT',
-                        style: TextStyle(fontSize: 15, color: Colors.white),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ),
+                    )
+                  : Container()
             ],
           ),
         ),
@@ -437,8 +447,8 @@ class _AddClubScreenState extends State<AddClubScreen> {
 }
 
 class MessageStream extends StatelessWidget {
-  MessageStream({required this.searchText});
-  final String searchText;
+  MessageStream({required this.searchText, required this.userType});
+  final String searchText, userType;
 
   @override
   Widget build(BuildContext context) {
@@ -472,6 +482,7 @@ class MessageStream extends StatelessWidget {
                 facultyAdvisorName: club.data()['Faculty Advisor Name'],
                 clubDocumentID: club.id,
                 facultyAdvisorEmail: club.data()['Faculty Advisor Email'],
+                userType: userType,
               ));
             }
           }

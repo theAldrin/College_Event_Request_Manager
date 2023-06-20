@@ -114,7 +114,9 @@ class _Add_InfoState extends State<Add_Info> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Clubs(),
+                            builder: (context) => Clubs(
+                              userType: widget.userType,
+                            ),
                           ),
                         );
                       },
