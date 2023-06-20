@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/faculty_profile.dart';
+import 'package:event_consent2/student_profile.dart';
 import 'package:flutter/material.dart';
 
 class allStudents extends StatefulWidget {
@@ -110,14 +111,15 @@ class _allStudentsState extends State<allStudents> {
   }
 }
 
-class FacultyCard extends StatelessWidget {
-  FacultyCard(
+class StudentCard extends StatelessWidget {
+  StudentCard(
       {required this.name,
-      required this.position,
+      required this.year1,
       required this.department,
       required this.club,
-      required this.facultyMail});
-  String name, department, position, club, facultyMail;
+      required this.studentMail,
+      required this.clas});
+  String name, department, year1, club, studentMail, clas;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +130,7 @@ class FacultyCard extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Faculty_profile(facultyMail: facultyMail),
+                builder: (context) => Student_Profile(studentMail: studentMail),
               ));
         },
         child: Container(
@@ -165,21 +167,31 @@ class FacultyCard extends StatelessWidget {
                       color: Colors.black),
                 ),
                 SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  position.toString(),
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Colors.black54),
-                ),
-                SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 Text(
                   'Department: ' + department,
                   textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      color: Colors.black),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Year: ' + year1,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      color: Colors.black),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Class: ' + clas,
                   style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 17,
@@ -214,7 +226,7 @@ class MessageStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: _firestore.collection('Faculty User Details').snapshots(),
+        stream: _firestore.collection('Student User Details').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(
@@ -224,7 +236,7 @@ class MessageStream extends StatelessWidget {
             );
           }
           final venues = snapshot.data?.docs.reversed;
-          List<FacultyCard> VenueList = [];
+          List<StudentCard> VenueList = [];
           for (var venue in venues!) {
             if (venue
                     .data()['Name']
@@ -235,7 +247,7 @@ class MessageStream extends StatelessWidget {
                     .toLowerCase()
                     .contains(searchText.toLowerCase()) ||
                 venue
-                    .data()['Position']
+                    .data()['Year']
                     .toLowerCase()
                     .contains(searchText.toLowerCase()) ||
                 venue
@@ -245,13 +257,18 @@ class MessageStream extends StatelessWidget {
                 venue
                     .data()['Email']
                     .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                venue
+                    .data()['Class']
+                    .toLowerCase()
                     .contains(searchText.toLowerCase())) {
-              VenueList.add(FacultyCard(
+              VenueList.add(StudentCard(
                 name: venue.data()['Name'],
-                position: venue.data()['Position'],
+                year1: venue.data()['Year'],
                 department: venue.data()['Department'],
                 club: venue.data()['Clubs'],
-                facultyMail: venue.data()['Email'],
+                studentMail: venue.data()['Email'],
+                clas: venue.data()['Class'],
               ));
             }
           }

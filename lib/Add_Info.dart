@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/admininstrator_profile.dart';
 import 'package:event_consent2/allFacultys.dart';
+import 'package:event_consent2/allStudents.dart';
 import 'package:event_consent2/calendar.dart';
 import 'package:event_consent2/departments.dart';
 import 'package:event_consent2/venues.dart';
@@ -6,11 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:event_consent2/clubs.dart';
 
 class Add_Info extends StatefulWidget {
-  const Add_Info({Key? key}) : super(key: key);
+  Add_Info({required this.userType});
+  String userType;
 
   @override
   State<Add_Info> createState() => _Add_InfoState();
 }
+
+final _firestore = FirebaseFirestore.instance;
 
 class _Add_InfoState extends State<Add_Info> {
   Widget _title() {
@@ -25,6 +31,24 @@ class _Add_InfoState extends State<Add_Info> {
         ),
       ),
     );
+  }
+
+  String adminMail = ' ';
+  void adminMailFinder() async {
+    final admins =
+        await _firestore.collection("Administrator User Details").get();
+    for (var admin in admins.docs) {
+      setState(() {
+        adminMail = admin.data()['Email'];
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    adminMailFinder();
   }
 
   @override
@@ -54,8 +78,7 @@ class _Add_InfoState extends State<Add_Info> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => Calendar(
-                              userType:
-                                  'ADMINISTRATOR', //TODO:CHANGE THIS TO INCORPARATE VARIOUS USERS
+                              userType: widget.userType,
                             ),
                           ),
                         );
@@ -67,7 +90,9 @@ class _Add_InfoState extends State<Add_Info> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Venues(),
+                            builder: (context) => Venues(
+                              userType: widget.userType,
+                            ),
                           ),
                         );
                       },
@@ -95,12 +120,35 @@ class _Add_InfoState extends State<Add_Info> {
                       },
                     ),
                     InfoCard(
+                      infoType: 'Students',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => allStudents(),
+                          ),
+                        );
+                      },
+                    ),
+                    InfoCard(
                       infoType: 'Faculties',
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => allFcaultys(),
+                          ),
+                        );
+                      },
+                    ),
+                    InfoCard(
+                      infoType: 'Administrator',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Administrator_profile(adminMail: adminMail),
                           ),
                         );
                       },

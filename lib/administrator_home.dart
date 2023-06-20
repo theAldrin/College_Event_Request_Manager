@@ -86,7 +86,9 @@ class _Administrator_homeState extends State<Administrator_home> {
           Event_request(
             userType: 'ADMINISTRATOR',
           ),
-          Add_Info(),
+          Add_Info(
+            userType: 'ADMINISTRATOR',
+          ),
           Administrator_profile(
             adminMail: currentUserEmail,
           ),

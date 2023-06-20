@@ -3,8 +3,8 @@ import 'package:event_consent2/venue_detail_edit.dart';
 import 'package:flutter/material.dart';
 
 class Venues extends StatefulWidget {
-  const Venues({Key? key}) : super(key: key);
-
+  Venues({required this.userType});
+  String userType;
   @override
   State<Venues> createState() => _VenuesState();
 }
@@ -65,26 +65,30 @@ class _VenuesState extends State<Venues> {
                     margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
                     child: _title(),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => SingleChildScrollView(
-                            child: Container(
-                          padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom +
-                                  30),
-                          child: AddVenueScreen(),
-                        )),
-                      );
-                    },
-                    child: Icon(
-                      Icons.add,
-                      size: 35,
-                      color: Color(0xffe46b10),
-                    ),
-                  )
+                  widget.userType == 'ADMINISTRATOR'
+                      ? TextButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) => SingleChildScrollView(
+                                  child: Container(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom +
+                                        30),
+                                child: AddVenueScreen(),
+                              )),
+                            );
+                          },
+                          child: Icon(
+                            Icons.add,
+                            size: 35,
+                            color: Color(0xffe46b10),
+                          ),
+                        )
+                      : Container()
                 ],
               ),
               Padding(
@@ -122,6 +126,7 @@ class _VenuesState extends State<Venues> {
               ),
               MessageStream(
                 searchText: _searchText,
+                userType: widget.userType,
               )
             ],
           ),
@@ -139,13 +144,15 @@ class VenueCard extends StatelessWidget {
       required this.department,
       required this.venueDocumentID,
       required this.facultyName,
-      required this.facultyMail});
+      required this.facultyMail,
+      required this.userType});
   String venueName,
       department,
       capacity,
       venueDocumentID,
       facultyName,
-      facultyMail;
+      facultyMail,
+      userType;
   String type;
 
   @override
@@ -199,40 +206,44 @@ class VenueCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Venue_detail_edit(
-                                venueDocumentID: venueDocumentID,
+                  userType == 'ADMINISTRATOR'
+                      ? Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Venue_detail_edit(
+                                      venueDocumentID: venueDocumentID,
+                                    ),
+                                  ));
+                            },
+                            child: Container(
+                              //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              width: 70,
+                              padding: EdgeInsets.symmetric(vertical: 7),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(6)),
+                                  // boxShadow: <BoxShadow>[
+                                  //   BoxShadow(
+                                  //       color: Colors.grey.shade900,
+                                  //       offset: Offset(2, 4),
+                                  //       blurRadius: 5,
+                                  //       spreadRadius: 2)
+                                  // ],
+                                  color: Color(0xFF000000)),
+                              child: Text(
+                                'EDIT',
+                                style: TextStyle(
+                                    fontSize: 15, color: Colors.white),
                               ),
-                            ));
-                      },
-                      child: Container(
-                        //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        width: 70,
-                        padding: EdgeInsets.symmetric(vertical: 7),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(6)),
-                            // boxShadow: <BoxShadow>[
-                            //   BoxShadow(
-                            //       color: Colors.grey.shade900,
-                            //       offset: Offset(2, 4),
-                            //       blurRadius: 5,
-                            //       spreadRadius: 2)
-                            // ],
-                            color: Color(0xFF000000)),
-                        child: Text(
-                          'EDIT',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
+                            ),
+                          ),
+                        )
+                      : Container()
                 ],
               ),
               SizedBox(
@@ -572,8 +583,8 @@ class _AddVenueScreenState extends State<AddVenueScreen> {
 }
 
 class MessageStream extends StatelessWidget {
-  MessageStream({required this.searchText});
-  final String searchText;
+  MessageStream({required this.searchText, required this.userType});
+  final String searchText, userType;
 
   @override
   Widget build(BuildContext context) {
@@ -622,6 +633,7 @@ class MessageStream extends StatelessWidget {
                 venueDocumentID: venue.id,
                 facultyName: venue.data()['Faculty Name'],
                 facultyMail: venue.data()['Faculty Email'],
+                userType: userType,
               ));
             }
           }
