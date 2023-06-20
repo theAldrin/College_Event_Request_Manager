@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'department_detail_edit.dart';
 
 class Department extends StatefulWidget {
-  const Department({Key? key}) : super(key: key);
-
+  Department({required this.userType});
+  String userType;
   @override
   State<Department> createState() => _DepartmentState();
 }
@@ -67,26 +67,30 @@ class _DepartmentState extends State<Department> {
                     margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
                     child: _title(),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => SingleChildScrollView(
-                            child: Container(
-                          padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom +
-                                  30),
-                          child: AddDepartmentScreen(),
-                        )),
-                      );
-                    },
-                    child: Icon(
-                      Icons.add,
-                      size: 35,
-                      color: Color(0xffe46b10),
-                    ),
-                  )
+                  widget.userType == 'ADMINISTRATOR'
+                      ? TextButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) => SingleChildScrollView(
+                                  child: Container(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom +
+                                        30),
+                                child: AddDepartmentScreen(),
+                              )),
+                            );
+                          },
+                          child: Icon(
+                            Icons.add,
+                            size: 35,
+                            color: Color(0xffe46b10),
+                          ),
+                        )
+                      : Container()
                 ],
               ),
               Padding(
@@ -124,6 +128,7 @@ class _DepartmentState extends State<Department> {
               ),
               MessageStream(
                 searchText: _searchText,
+                userType: widget.userType,
               )
             ],
           ),
@@ -138,9 +143,10 @@ class DepartmentCard extends StatelessWidget {
       {required this.departmentName,
       required this.hodName,
       required this.departmentDocumentID,
-      required this.hodEmail});
+      required this.hodEmail,
+      required this.userType});
   String departmentName;
-  String hodName, hodEmail, departmentDocumentID;
+  String hodName, hodEmail, departmentDocumentID, userType;
 
   @override
   Widget build(BuildContext context) {
@@ -212,43 +218,47 @@ class DepartmentCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Department_detail_edit(
-                              departmentDocumentID: departmentDocumentID,
+              userType == 'ADMINISTRATOR'
+                  ? Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Department_detail_edit(
+                                    departmentDocumentID: departmentDocumentID,
+                                  ),
+                                ));
+                          },
+                          child: Container(
+                            //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            width: 70,
+                            padding: EdgeInsets.symmetric(vertical: 7),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(6)),
+                                // boxShadow: <BoxShadow>[
+                                //   BoxShadow(
+                                //       color: Colors.grey.shade900,
+                                //       offset: Offset(2, 4),
+                                //       blurRadius: 5,
+                                //       spreadRadius: 2)
+                                // ],
+                                color: Color(0xFF000000)),
+                            child: Text(
+                              'EDIT',
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.white),
                             ),
-                          ));
-                    },
-                    child: Container(
-                      //margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                      width: 70,
-                      padding: EdgeInsets.symmetric(vertical: 7),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
-                          // boxShadow: <BoxShadow>[
-                          //   BoxShadow(
-                          //       color: Colors.grey.shade900,
-                          //       offset: Offset(2, 4),
-                          //       blurRadius: 5,
-                          //       spreadRadius: 2)
-                          // ],
-                          color: Color(0xFF000000)),
-                      child: Text(
-                        'EDIT',
-                        style: TextStyle(fontSize: 15, color: Colors.white),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ),
+                    )
+                  : Container()
             ],
           ),
         ),
@@ -433,8 +443,8 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
 }
 
 class MessageStream extends StatelessWidget {
-  MessageStream({required this.searchText});
-  final String searchText;
+  MessageStream({required this.searchText, required this.userType});
+  final String searchText, userType;
 
   @override
   Widget build(BuildContext context) {
@@ -468,6 +478,7 @@ class MessageStream extends StatelessWidget {
                 departmentDocumentID: department.id,
                 hodName: department.data()['HOD Name'],
                 hodEmail: department.data()['HOD Email'],
+                userType: userType,
               ));
             }
           }

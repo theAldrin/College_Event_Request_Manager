@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/Add_Info.dart';
 import 'package:event_consent2/student_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -80,18 +81,16 @@ class _Student_homeState extends State<Student_home> {
       body: PageView(
         controller: _controller,
         children: <Widget>[
-          Student_Profile(
-            studentMail: currentUserEmail,
-          ),
           Event_history(
             userType: 'STUDENT',
           ),
           Event_request(
             userType: 'STUDENT',
           ),
-          Calendar(
-            userType: 'STUDENTFACULTY',
-          )
+          Add_Info(userType: 'STUDENT'),
+          Student_Profile(
+            studentMail: currentUserEmail,
+          ),
         ],
       ),
       extendBody: true,
@@ -101,14 +100,14 @@ class _Student_homeState extends State<Student_home> {
         flat: false,
         useActiveColorByDefault: false,
         items: [
-          RollingBottomBarItem(Icons.person,
-              label: 'Profile', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.dock,
               label: 'History', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.add_box,
               label: 'Add Event', activeColor: Color(0xfff3892b)),
-          RollingBottomBarItem(Icons.calendar_month,
-              label: 'Calendar', activeColor: Color(0xfff3892b)),
+          RollingBottomBarItem(Icons.info,
+              label: 'Info', activeColor: Color(0xfff3892b)),
+          RollingBottomBarItem(Icons.person,
+              label: 'Profile', activeColor: Color(0xfff3892b)),
         ],
         enableIconRotation: true,
         onTap: (index) {

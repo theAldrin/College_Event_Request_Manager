@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/Add_Info.dart';
 import 'package:event_consent2/pending_events.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -80,19 +81,17 @@ class _Facluty_homeState extends State<Facluty_home> {
       body: PageView(
         controller: _controller,
         children: <Widget>[
-          Faculty_profile(
-            facultyMail: currentUserEmail,
-          ),
+          Pending_events(),
           Event_history(
             userType: 'FACULTY',
           ),
           Event_request(
             userType: 'FACULTY',
           ),
-          Pending_events(),
-          Calendar(
-            userType: 'STUDENTFACULTY',
-          )
+          Add_Info(userType: 'FACULTY'),
+          Faculty_profile(
+            facultyMail: currentUserEmail,
+          ),
         ],
       ),
       extendBody: true,
@@ -102,16 +101,16 @@ class _Facluty_homeState extends State<Facluty_home> {
         flat: false,
         useActiveColorByDefault: false,
         items: [
-          RollingBottomBarItem(Icons.person,
-              label: 'Profile', activeColor: Color(0xfff3892b)),
+          RollingBottomBarItem(Icons.home_rounded,
+              label: 'Pending', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.dock,
               label: 'History', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.add_box,
               label: 'Add Event', activeColor: Color(0xfff3892b)),
-          RollingBottomBarItem(Icons.home_rounded,
-              label: 'Pending', activeColor: Color(0xfff3892b)),
-          RollingBottomBarItem(Icons.calendar_month,
-              label: 'Calendar', activeColor: Color(0xfff3892b)),
+          RollingBottomBarItem(Icons.info,
+              label: 'Info', activeColor: Color(0xfff3892b)),
+          RollingBottomBarItem(Icons.person,
+              label: 'Profile', activeColor: Color(0xfff3892b)),
         ],
         enableIconRotation: true,
         onTap: (index) {
