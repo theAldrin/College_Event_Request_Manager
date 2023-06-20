@@ -54,6 +54,7 @@ class _Add_InfoState extends State<Add_Info> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xffffffff),
         body: SafeArea(

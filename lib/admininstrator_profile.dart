@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/administrator_profile_edit.dart';
+import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +40,7 @@ class _Administrator_profileState extends State<Administrator_profile> {
             college = user.data()['College'];
             email = user.data()['Email'];
             phoneno = user.data()['Phone No'];
+            imageUrl = user.data()['Image'];
           });
         }
       }
@@ -52,11 +54,12 @@ class _Administrator_profileState extends State<Administrator_profile> {
     getData();
   }
 
-  String name = '', college = '', email = '', phoneno = '';
+  String name = '', college = '', email = '', phoneno = '', imageUrl = '';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         //backgroundColor: Color(0xfff3892b),
         body: SafeArea(
@@ -67,36 +70,63 @@ class _Administrator_profileState extends State<Administrator_profile> {
               SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    Icons.exit_to_app,
-                    color: Colors.black54,
-                    size: 30,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Administrator_profile_edit(),
-                          ));
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black54,
-                      size: 30,
+              currentUserEmail == widget.adminMail
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            await _auth.signOut();
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WelcomePage()),
+                            );
+                          },
+                          child: Icon(
+                            Icons.exit_to_app,
+                            color: Colors.black54,
+                            size: 30,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      Administrator_profile_edit(),
+                                ));
+                          },
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.black54,
+                            size: 30,
+                          ),
+                        )
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.black54,
+                            ))
+                      ],
                     ),
-                  )
-                ],
-              ),
               SizedBox(
                 height: 20,
               ),
               CircleAvatar(
                 radius: 50.0,
-                backgroundImage: AssetImage('images/ereh.png'),
+                backgroundImage: NetworkImage(imageUrl),
               ),
               Text(
                 name,

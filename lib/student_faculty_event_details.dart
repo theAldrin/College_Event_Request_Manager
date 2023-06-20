@@ -97,8 +97,21 @@ class _Student_Faculty_event_detailsState
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.black54,
+                        ))
+                  ],
+                ),
                 Container(
-                  margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                  margin: EdgeInsets.fromLTRB(15, 10, 0, 30),
                   child: _title(),
                   width: double.infinity,
                 ),

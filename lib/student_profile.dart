@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'student_profile_edit.dart';
@@ -59,6 +60,7 @@ class _Student_ProfileState extends State<Student_Profile> {
             year = user.data()['Year'];
             clubs = user.data()['Clubs'];
             phoneno = user.data()['Phone No'];
+            imageUrl = user.data()['Image'];
           });
         }
       }
@@ -108,11 +110,13 @@ class _Student_ProfileState extends State<Student_Profile> {
       clas = '',
       year = '',
       clubs = '',
-      phoneno = '';
+      phoneno = '',
+      imageUrl = '';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         //backgroundColor: Color(0xfff3892b),
         body: SafeArea(
@@ -123,36 +127,62 @@ class _Student_ProfileState extends State<Student_Profile> {
               SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    Icons.exit_to_app,
-                    color: Colors.black54,
-                    size: 30,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Student_profile_edit(),
-                          ));
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black54,
-                      size: 30,
+              currentUserEmail == widget.studentMail
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            await _auth.signOut();
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WelcomePage()),
+                            );
+                          },
+                          child: Icon(
+                            Icons.exit_to_app,
+                            color: Colors.black54,
+                            size: 30,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Student_profile_edit(),
+                                ));
+                          },
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.black54,
+                            size: 30,
+                          ),
+                        )
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.black54,
+                            ))
+                      ],
                     ),
-                  )
-                ],
-              ),
               SizedBox(
                 height: 20,
               ),
               CircleAvatar(
                 radius: 50.0,
-                backgroundImage: AssetImage('images/ereh.png'),
+                backgroundImage: NetworkImage(imageUrl),
               ),
               Text(
                 name,
@@ -211,7 +241,7 @@ class _Student_ProfileState extends State<Student_Profile> {
               SizedBox(
                 height: 20,
               ),
-              _submitButton()
+              //_submitButton()
             ],
           ),
         )),

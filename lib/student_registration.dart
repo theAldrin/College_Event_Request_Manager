@@ -1,9 +1,12 @@
 import 'dart:core';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/loginPage.dart';
 import 'package:event_consent2/welcomePage.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'components/bezierContainer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -148,6 +151,7 @@ class _Student_registrationState extends State<Student_registration> {
               'Year': year,
               'Clubs': club,
               'Phone No': phoneno,
+              'Image': imageUrl,
             });
             showDialog(
               context: context,
@@ -263,7 +267,8 @@ class _Student_registrationState extends State<Student_registration> {
       year = '1',
       clas = 'NONE',
       club = 'NONE',
-      phoneno;
+      phoneno,
+      imageUrl = '';
   List<String> years = ['1', '2', '3', '4', '5'];
   final _auth = FirebaseAuth.instance;
   @override
@@ -288,6 +293,68 @@ class _Student_registrationState extends State<Student_registration> {
                   SizedBox(height: height * .2),
                   _title(),
                   SizedBox(height: 50),
+                  imageUrl == ''
+                      ? IconButton(
+                          onPressed: () async {
+                            /*
+                * Step 1. Pick/Capture an image   (image_picker)
+                * Step 2. Upload the image to Firebase storage
+                * Step 3. Get the URL of the uploaded image
+                * Step 4. Store the image URL inside the corresponding
+                *         document of the database.
+                * Step 5. Display the image on the list
+                *
+                * */
+
+                            /*Step 1:Pick image*/
+                            //Install image_picker
+                            //Import the corresponding library
+
+                            ImagePicker imagePicker = ImagePicker();
+                            XFile? file = await imagePicker.pickImage(
+                                source: ImageSource.gallery);
+                            print('${file?.path}');
+
+                            if (file == null) return;
+                            //Import dart:core
+                            String uniqueFileName = DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString();
+
+                            /*Step 2: Upload to Firebase storage*/
+                            //Install firebase_storage
+                            //Import the library
+
+                            //Get a reference to storage root
+                            Reference referenceRoot =
+                                FirebaseStorage.instance.ref();
+                            Reference referenceDirImages =
+                                referenceRoot.child('images');
+
+                            //Create a reference for the image to be stored
+                            Reference referenceImageToUpload =
+                                referenceDirImages.child('name');
+
+                            //Handle errors/success
+                            try {
+                              //Store the file
+                              await referenceImageToUpload
+                                  .putFile(File(file!.path));
+                              //Success: get the download URL
+                              imageUrl =
+                                  await referenceImageToUpload.getDownloadURL();
+                            } catch (error) {
+                              //Some error occurred
+                            }
+                          },
+                          icon: Icon(Icons.camera_alt))
+                      : CircleAvatar(
+                          radius: 50.0,
+                          backgroundImage: NetworkImage(imageUrl),
+                        ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
                     child: Column(

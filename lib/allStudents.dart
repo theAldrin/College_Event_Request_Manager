@@ -34,6 +34,7 @@ class _allStudentsState extends State<allStudents> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         // floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
         // floatingActionButton: FloatingActionButton(

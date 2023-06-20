@@ -71,7 +71,7 @@ class _Department_detail_editState extends State<Department_detail_edit> {
 
   Widget _title() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: RichText(
         textAlign: TextAlign.left,
         text: TextSpan(
@@ -96,171 +96,195 @@ class _Department_detail_editState extends State<Department_detail_edit> {
       height: height,
       child: Stack(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(height: 90),
-                  _title(),
-                  SizedBox(height: 50),
-                  Text(
-                    'HOD',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    iconEnabledColor: Color(0xfff7892b),
-                    iconSize: 60,
-                    value: hodMail,
-                    items: facultyEmailList
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: facultyNameFromMailWidget(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      // Change function parameter to nullable string
-                      setState(() {
-                        hodMail = newValue!;
-                        hodName = facultyNameFromMailString(hodMail);
-                      });
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          await _firestore
-                              .collection('Departments')
-                              .doc(widget.departmentDocumentID)
-                              .update(
-                                  {'HOD Email': hodMail, 'HOD Name': hodName});
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Expanded(
-                                child: AlertDialog(
-                                  title: Text(
-                                      'Department details updated Succesfully'),
-                                  // content: Text('GeeksforGeeks'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        //Navigator.pop(context);//error
-                                        //Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          'OK',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 20),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: Colors.grey.shade200,
-                                    offset: Offset(2, 4),
-                                    blurRadius: 5,
-                                    spreadRadius: 2)
-                              ],
-                              color: Colors.black),
-                          child: Center(
-                            child: Text(
-                              'UPDATE',
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          await _firestore
-                              .collection('Departments')
-                              .doc(widget.departmentDocumentID)
-                              .delete();
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Expanded(
-                                child: AlertDialog(
-                                  title: Text(
-                                      'Department details Deleted Succesfully'),
-                                  // content: Text('GeeksforGeeks'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        //Navigator.pop(context);//error
-                                        //Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          'OK',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 20),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: Colors.grey.shade200,
-                                    offset: Offset(2, 4),
-                                    blurRadius: 5,
-                                    spreadRadius: 2)
-                              ],
-                              color: Colors.black),
-                          child: Center(
-                            child: Text(
-                              'DELETE',
-                              style:
-                                  TextStyle(fontSize: 20, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 60),
+          Column(
+            children: [
+              SizedBox(
+                height: 40,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.black,
+                      ))
                 ],
               ),
-            ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(height: 25),
+                      _title(),
+                      SizedBox(height: 50),
+                      Text(
+                        'HOD',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        iconEnabledColor: Color(0xfff7892b),
+                        iconSize: 60,
+                        value: hodMail,
+                        items: facultyEmailList
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: facultyNameFromMailWidget(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          // Change function parameter to nullable string
+                          setState(() {
+                            hodMail = newValue!;
+                            hodName = facultyNameFromMailString(hodMail);
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              await _firestore
+                                  .collection('Departments')
+                                  .doc(widget.departmentDocumentID)
+                                  .update({
+                                'HOD Email': hodMail,
+                                'HOD Name': hodName
+                              });
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Expanded(
+                                    child: AlertDialog(
+                                      title: Text(
+                                          'Department details updated Succesfully'),
+                                      // content: Text('GeeksforGeeks'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            //Navigator.pop(context);//error
+                                            //Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              'OK',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 20),
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  boxShadow: <BoxShadow>[
+                                    BoxShadow(
+                                        color: Colors.grey.shade200,
+                                        offset: Offset(2, 4),
+                                        blurRadius: 5,
+                                        spreadRadius: 2)
+                                  ],
+                                  color: Colors.black),
+                              child: Center(
+                                child: Text(
+                                  'UPDATE',
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              await _firestore
+                                  .collection('Departments')
+                                  .doc(widget.departmentDocumentID)
+                                  .delete();
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Expanded(
+                                    child: AlertDialog(
+                                      title: Text(
+                                          'Department details Deleted Succesfully'),
+                                      // content: Text('GeeksforGeeks'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            //Navigator.pop(context);//error
+                                            //Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              'OK',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 20),
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  boxShadow: <BoxShadow>[
+                                    BoxShadow(
+                                        color: Colors.grey.shade200,
+                                        offset: Offset(2, 4),
+                                        blurRadius: 5,
+                                        spreadRadius: 2)
+                                  ],
+                                  color: Colors.black),
+                              child: Center(
+                                child: Text(
+                                  'DELETE',
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 60),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           //Positioned(top: 40, left: 0, child: _backButton()),
         ],

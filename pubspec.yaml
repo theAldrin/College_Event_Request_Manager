@@ -43,6 +43,8 @@ dependencies:
   intl: ^0.17.0
   flutter_datetime_picker_bdaya: ^3.0.1
   rolling_bottom_bar: ^0.2.2
+  image_picker: ^0.8.9
+  firebase_storage: ^11.2.3
 
 dev_dependencies:
   flutter_test:

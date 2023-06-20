@@ -66,6 +66,7 @@ class _Event_historyState extends State<Event_history> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xffffff),
         body: SafeArea(

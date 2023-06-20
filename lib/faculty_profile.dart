@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/student_profile_edit.dart';
+import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'faculty_profile_edit.dart';
@@ -51,45 +52,10 @@ class _Faculty_profileState extends State<Faculty_profile> {
             position = user.data()['Position'];
             clubs = user.data()['Clubs'];
             phoneno = user.data()['Phone No'];
+            imageUrl = user.data()['Image'];
           });
         }
       }
-    }
-  }
-
-  Widget _submitButton() {
-    if (currentUserEmail == widget.facultyMail) {
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Faculty_profile_edit(),
-              ));
-        },
-        child: Container(
-          margin: EdgeInsets.fromLTRB(120, 15, 120, 30),
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(vertical: 15),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-              // boxShadow: <BoxShadow>[
-              //   BoxShadow(
-              //       color: Colors.grey.shade900,
-              //       offset: Offset(2, 4),
-              //       blurRadius: 5,
-              //       spreadRadius: 2)
-              // ],
-              color: Color(0xFF000000)),
-          child: Text(
-            'EDIT',
-            style: TextStyle(fontSize: 20, color: Colors.white),
-          ),
-        ),
-      );
-    } else {
-      return Text('');
     }
   }
 
@@ -99,11 +65,13 @@ class _Faculty_profileState extends State<Faculty_profile> {
       department = '',
       position = '',
       clubs = '',
-      phoneno = '';
+      phoneno = '',
+      imageUrl = '';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xffffffff),
         body: SafeArea(
@@ -114,36 +82,62 @@ class _Faculty_profileState extends State<Faculty_profile> {
               SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    Icons.exit_to_app,
-                    color: Colors.black54,
-                    size: 30,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Faculty_profile_edit(),
-                          ));
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black54,
-                      size: 30,
+              currentUserEmail == widget.facultyMail
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            await _auth.signOut();
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => WelcomePage()),
+                            );
+                          },
+                          child: Icon(
+                            Icons.exit_to_app,
+                            color: Colors.black54,
+                            size: 30,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Faculty_profile_edit(),
+                                ));
+                          },
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.black54,
+                            size: 30,
+                          ),
+                        )
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.black54,
+                            ))
+                      ],
                     ),
-                  )
-                ],
-              ),
               SizedBox(
                 height: 20,
               ),
               CircleAvatar(
                 radius: 50.0,
-                backgroundImage: AssetImage('images/ereh.png'),
+                backgroundImage: NetworkImage(imageUrl),
               ),
               Text(
                 name,
@@ -194,7 +188,6 @@ class _Faculty_profileState extends State<Faculty_profile> {
               SizedBox(
                 height: 30,
               ),
-              _submitButton()
             ],
           ),
         )),

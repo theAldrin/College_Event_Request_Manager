@@ -65,6 +65,7 @@ class _All_eventsState extends State<All_events> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xffffff),
         body: SafeArea(

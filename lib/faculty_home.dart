@@ -106,7 +106,7 @@ class _Facluty_homeState extends State<Facluty_home> {
           RollingBottomBarItem(Icons.dock,
               label: 'History', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.add_box,
-              label: 'Add Event', activeColor: Color(0xfff3892b)),
+              label: 'Add', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.info,
               label: 'Info', activeColor: Color(0xfff3892b)),
           RollingBottomBarItem(Icons.person,

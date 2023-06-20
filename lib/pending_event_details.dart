@@ -511,6 +511,7 @@ class _Pending_Event_DetailsState extends State<Pending_Event_Details> {
   Widget build(BuildContext context) {
     facultyMails.remove(student);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xFFF8F4F2),
         body: SafeArea(
