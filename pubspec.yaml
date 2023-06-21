@@ -48,8 +48,6 @@ dependencies:
   flutter_phone_direct_caller: ^2.1.1
   url_launcher: ^6.1.11
   dropdown_search: ^3.0.1
-  custom_searchable_dropdown: ^2.1.1
-  searchfield: ^0.8.3
 
 dev_dependencies:
   flutter_test:
