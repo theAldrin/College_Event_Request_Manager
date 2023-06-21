@@ -1,8 +1,11 @@
+import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_bdaya/flutter_datetime_picker_bdaya.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:searchfield/searchfield.dart';
 
 class Event_request extends StatefulWidget {
   Event_request({required this.userType});
@@ -109,7 +112,7 @@ class _Event_requestState extends State<Event_request> {
 
   Widget _title() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+      padding: const EdgeInsets.fromLTRB(6.5, 10, 0, 0),
       child: RichText(
         textAlign: TextAlign.left,
         text: TextSpan(
@@ -202,7 +205,7 @@ class _Event_requestState extends State<Event_request> {
             children: <Widget>[
               SizedBox(height: 40),
               _title(),
-              SizedBox(height: 50),
+              SizedBox(height: 30),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                 child: Column(
@@ -226,7 +229,37 @@ class _Event_requestState extends State<Event_request> {
                             filled: true))
                   ],
                 ),
-              ), //Event Name
+              ),
+              // Padding(
+              //   padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Text(
+              //         'Associated Faculty Email',
+              //         style:
+              //             TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              //       ),
+              //       SizedBox(height: 5),
+              //       DropdownSearch<String>(
+              //         mode: Mode.MENU,
+              //         showSelectedItems: true,
+              //         items: facultyNameList,
+              //         dropdownSearchDecoration: InputDecoration(
+              //           hintText: "Select",
+              //         ),
+              //         onChanged: (value) {
+              //           print(value);
+              //         },
+              //         //selectedItem: "",
+              //         showSearchBox: true,
+              //         searchFieldProps: TextFieldProps(
+              //           cursorColor: Colors.blue,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ), //Event Name
               SizedBox(height: 10),
               TextButton(
                 onPressed: () {
@@ -478,7 +511,7 @@ class _Event_requestState extends State<Event_request> {
                     DropdownButton<String>(
                       isExpanded: true,
                       iconEnabledColor: Color(0xfff7892b),
-                      iconSize: 60,
+                      iconSize: 25,
                       value: associatedFacultyMail,
                       items: facultyEmailList
                           .map<DropdownMenuItem<String>>((String value) {
@@ -521,7 +554,9 @@ class _Event_requestState extends State<Event_request> {
                             //     .format(tempDate);
                             // print(datesh);
                             if ((event.data()['Date'] == formattedDate) &&
-                                (event.data()['Venue'] == venue)) {
+                                (event.data()['Venue'] == venue) &&
+                                event.data()['Status'] != 'WITHDRAWN' &&
+                                event.data()['Status'] != 'REJECTED') {
                               //TODO: Admin accepted status check
                               DateTime thisEventStartTime =
                                   new DateFormat("hh:mm")
@@ -697,10 +732,7 @@ class _Event_requestState extends State<Event_request> {
                             gradient: LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xfffbb448),
-                                  Color(0xfff7892b)
-                                ])),
+                                colors: [Colors.black87, Colors.black87])),
                         child: Center(
                           child: Text(
                             'VERIFY',

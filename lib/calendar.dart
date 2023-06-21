@@ -123,16 +123,18 @@ class ScheduleExample extends State<AppointmentDetails> {
 
     if (widget.events != null) {
       for (var event in widget.events) {
-        print(event.data()['Event Name']);
-        appointments.add(Appointment(
-          notes: event.id,
-          startTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
-              '${formatString(event.data()['Date']) + ' ' + event.data()['Event Start Time']}:00'),
-          endTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
-              '${formatString(event.data()['Date']) + ' ' + event.data()['Event End Time']}:00'),
-          subject: event.data()['Event Name'],
-          color: Colors.green,
-        ));
+        if (event.data()['Status'] != 'REJECTED' &&
+            event.data()['Status'] != 'WITHDRAWN') {
+          appointments.add(Appointment(
+            notes: event.id,
+            startTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
+                '${formatString(event.data()['Date']) + ' ' + event.data()['Event Start Time']}:00'),
+            endTime: DateFormat("yyyy-MM-dd hh:mm:ss").parse(
+                '${formatString(event.data()['Date']) + ' ' + event.data()['Event End Time']}:00'),
+            subject: event.data()['Event Name'],
+            color: Colors.green,
+          ));
+        }
       }
     }
     // appointments.add(Appointment(

@@ -4,6 +4,7 @@ import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Administrator_profile extends StatefulWidget {
   Administrator_profile({required this.adminMail});
@@ -123,11 +124,14 @@ class _Administrator_profileState extends State<Administrator_profile> {
                       ],
                     ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               CircleAvatar(
                 radius: 50.0,
                 backgroundImage: NetworkImage(imageUrl),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Text(
                 name,
@@ -137,6 +141,9 @@ class _Administrator_profileState extends State<Administrator_profile> {
                   color: Color(0xfff3892b),
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Text(
                 'ADMINISTRATOR',
@@ -155,6 +162,9 @@ class _Administrator_profileState extends State<Administrator_profile> {
                   color: Colors.yellow.shade900,
                 ),
               ),
+              SizedBox(
+                height: 7,
+              ),
               ProfileDetailsCard(
                 icon: Icons.school,
                 text: college,
@@ -168,9 +178,15 @@ class _Administrator_profileState extends State<Administrator_profile> {
                   text: phoneno,
                 ),
               ),
-              ProfileDetailsCard(
-                icon: Icons.email,
-                text: email,
+              GestureDetector(
+                onTap: () {
+                  final Uri emailUri = Uri(scheme: 'mailto', path: email);
+                  launchUrl(emailUri);
+                },
+                child: ProfileDetailsCard(
+                  icon: Icons.email,
+                  text: email,
+                ),
               ),
               SizedBox(
                 height: 50,

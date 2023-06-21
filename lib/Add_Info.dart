@@ -63,7 +63,7 @@ class _Add_InfoState extends State<Add_Info> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                margin: EdgeInsets.fromLTRB(20, 46, 0, 30),
                 child: _title(),
               ),
               SizedBox(

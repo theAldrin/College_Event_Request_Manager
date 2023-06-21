@@ -64,12 +64,12 @@ class _allFcaultysState extends State<allFcaultys> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                margin: EdgeInsets.fromLTRB(10, 46, 0, 30),
                 child: _title(),
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                 child: SizedBox(
                   height: 40,
                   child: TextFormField(
@@ -123,7 +123,7 @@ class FacultyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: TextButton(
         onPressed: () {
           Navigator.push(
@@ -149,7 +149,7 @@ class FacultyCard extends StatelessWidget {
                   offset: Offset(0, 5)),
             ],
           ),
-          margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
+          margin: EdgeInsets.fromLTRB(2, 0, 2, 10),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(15, 20, 10, 20),
             child: Column(

@@ -135,11 +135,14 @@ class _Faculty_profileState extends State<Faculty_profile> {
                       ],
                     ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               CircleAvatar(
                 radius: 50.0,
                 backgroundImage: NetworkImage(imageUrl),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Text(
                 name,
@@ -149,6 +152,9 @@ class _Faculty_profileState extends State<Faculty_profile> {
                   color: Color(0xfff3892b),
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Text(
                 position,
@@ -166,6 +172,9 @@ class _Faculty_profileState extends State<Faculty_profile> {
                 child: Divider(
                   color: Colors.yellow.shade900,
                 ),
+              ),
+              SizedBox(
+                height: 7,
               ),
               ProfileDetailsCard(
                 icon: Icons.school,
@@ -188,9 +197,15 @@ class _Faculty_profileState extends State<Faculty_profile> {
                   text: phoneno,
                 ),
               ),
-              ProfileDetailsCard(
-                icon: Icons.email,
-                text: email,
+              GestureDetector(
+                onTap: () {
+                  final Uri emailUri = Uri(scheme: 'mailto', path: email);
+                  launchUrl(emailUri);
+                },
+                child: ProfileDetailsCard(
+                  icon: Icons.email,
+                  text: email,
+                ),
               ),
               SizedBox(
                 height: 30,

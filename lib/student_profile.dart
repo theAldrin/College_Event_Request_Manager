@@ -3,6 +3,7 @@ import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'student_profile_edit.dart';
 
 class Student_Profile extends StatefulWidget {
@@ -179,11 +180,14 @@ class _Student_ProfileState extends State<Student_Profile> {
                       ],
                     ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               CircleAvatar(
                 radius: 50.0,
                 backgroundImage: NetworkImage(imageUrl),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Text(
                 name,
@@ -193,6 +197,9 @@ class _Student_ProfileState extends State<Student_Profile> {
                   color: Color(0xfff3892b),
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              SizedBox(
+                height: 7,
               ),
               Text(
                 'STUDENT',
@@ -210,6 +217,9 @@ class _Student_ProfileState extends State<Student_Profile> {
                 child: Divider(
                   color: Colors.yellow.shade900,
                 ),
+              ),
+              SizedBox(
+                height: 7,
               ),
               ProfileDetailsCard(
                 icon: Icons.school,
@@ -240,9 +250,15 @@ class _Student_ProfileState extends State<Student_Profile> {
                   text: phoneno,
                 ),
               ),
-              ProfileDetailsCard(
-                icon: Icons.email,
-                text: email,
+              GestureDetector(
+                onTap: () {
+                  final Uri emailUri = Uri(scheme: 'mailto', path: email);
+                  launchUrl(emailUri);
+                },
+                child: ProfileDetailsCard(
+                  icon: Icons.email,
+                  text: email,
+                ),
               ),
               SizedBox(
                 height: 20,

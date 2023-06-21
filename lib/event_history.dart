@@ -61,6 +61,13 @@ class _Event_historyState extends State<Event_history> {
     );
   }
 
+  double scrolloffset = 0;
+  void setVisibility(double scrollOffset) {
+    setState(() {
+      scrolloffset = scrollOffset;
+    });
+  }
+
   String? _selectedStatus = 'ALL', _selectedUserType = 'ALL';
   late String _searchText = '';
   @override
@@ -74,162 +81,178 @@ class _Event_historyState extends State<Event_history> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                margin: EdgeInsets.fromLTRB(20, 46, 0, 30),
                 child: _title(),
                 width: double.infinity,
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                child: SizedBox(
-                  height: 40,
-                  child: TextFormField(
-                    // style: ,
-                    onChanged: (value) {
-                      setState(() {
-                        _searchText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                        focusColor: Colors.grey,
-                        contentPadding: EdgeInsets.zero,
-                        hintText: "Search",
-                        hintStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: const BorderSide(width: 4)),
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          size: 15,
-                        )),
-                  ),
-                ),
-              ),
-              SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: widget.userType == 'FACULTY'
-                    ? MainAxisAlignment.spaceEvenly
-                    : MainAxisAlignment.center,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
-                        child: Text(
-                          'STATUS',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500),
+              Visibility(
+                visible: scrolloffset > 20 ? false : true,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 23),
+                      child: SizedBox(
+                        height: 40,
+                        child: TextFormField(
+                          // style: ,
+                          onChanged: (value) {
+                            setState(() {
+                              _searchText = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                              focusColor: Colors.grey,
+                              contentPadding: EdgeInsets.zero,
+                              hintText: "Search",
+                              hintStyle: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                              ),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(width: 4)),
+                              prefixIcon: const Icon(
+                                Icons.search,
+                                size: 15,
+                              )),
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 0.9,
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 0),
-                          child: DropdownButton<String>(
-                            //isExpanded: true,
-                            iconEnabledColor: Color(0xfff7892b),
-                            iconSize: 25,
-                            underline: SizedBox(),
-                            value: _selectedStatus,
-                            items: <String>[
-                              'ALL',
-                              'ONGOING',
-                              'FINAL FACULTY ACCEPTED',
-                              'ADMIN ACCEPTED',
-                              'COMPLETED',
-                              'REJECTED',
-                              'WITHDRAWN'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
+                    ),
+                    SizedBox(height: 18),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+                      child: Row(
+                        mainAxisAlignment: widget.userType == 'FACULTY'
+                            ? MainAxisAlignment.spaceBetween
+                            : MainAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
                                 child: Text(
-                                  value,
+                                  'STATUS',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500),
                                 ),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              // Change function parameter to nullable string
-                              setState(() {
-                                _selectedStatus = newValue;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  widget.userType == 'FACULTY'
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
-                              child: Text(
-                                'USER',
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w500),
                               ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 0.9,
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 0.9,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                                borderRadius: BorderRadius.circular(15),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 0),
+                                  child: DropdownButton<String>(
+                                    //isExpanded: true,
+                                    iconEnabledColor: Color(0xfff7892b),
+                                    iconSize: 25,
+                                    underline: SizedBox(),
+                                    value: _selectedStatus,
+                                    items: <String>[
+                                      'ALL',
+                                      'ONGOING',
+                                      'FINAL FACULTY ACCEPTED',
+                                      'ADMIN ACCEPTED',
+                                      'COMPLETED',
+                                      'REJECTED',
+                                      'WITHDRAWN'
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      // Change function parameter to nullable string
+                                      setState(() {
+                                        _selectedStatus = newValue;
+                                      });
+                                    },
+                                  ),
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 1),
-                                child: DropdownButton<String>(
-                                  //isExpanded: true,
-                                  iconEnabledColor: Color(0xfff7892b),
-                                  iconSize: 25,
-                                  underline: SizedBox(),
-                                  value: _selectedUserType,
-                                  items: <String>[
-                                    'ALL',
-                                    'MY EVENTS',
-                                    'OTHERS EVENTS',
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
+                            ],
+                          ),
+                          widget.userType == 'FACULTY'
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          6, 0, 0, 3.5),
                                       child: Text(
-                                        value,
+                                        'USER',
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500),
                                       ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    // Change function parameter to nullable string
-                                    setState(() {
-                                      _selectedUserType = newValue;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Text(''),
-                ],
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.grey,
+                                          width: 0.9,
+                                        ),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 1),
+                                        child: DropdownButton<String>(
+                                          //isExpanded: true,
+                                          iconEnabledColor: Color(0xfff7892b),
+                                          iconSize: 25,
+                                          underline: SizedBox(),
+                                          value: _selectedUserType,
+                                          items: <String>[
+                                            'ALL',
+                                            'MY EVENTS',
+                                            'OTHERS EVENTS',
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(
+                                                value,
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (String? newValue) {
+                                            // Change function parameter to nullable string
+                                            setState(() {
+                                              _selectedUserType = newValue;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(''),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 10),
               MessageStream(
@@ -240,6 +263,7 @@ class _Event_historyState extends State<Event_history> {
                 students: students,
                 faculties: faculties,
                 admins: admins,
+                visibilitysetter: setVisibility,
               ),
             ],
           ),
@@ -277,7 +301,7 @@ String generatedUserName(
   }
 }
 
-class MessageStream extends StatelessWidget {
+class MessageStream extends StatefulWidget {
   MessageStream(
       {required this.userType,
       required this.searchText,
@@ -285,10 +309,42 @@ class MessageStream extends StatelessWidget {
       required this.selectedUserType,
       required this.students,
       required this.faculties,
-      required this.admins});
+      required this.admins,
+      required this.visibilitysetter});
   String userType;
   final String searchText, selectedUserType, selectedStatus;
   var students, faculties, admins;
+  Function visibilitysetter;
+
+  @override
+  State<MessageStream> createState() => _MessageStreamState();
+}
+
+class _MessageStreamState extends State<MessageStream> {
+  ScrollController _scrollController = ScrollController();
+  double scrollOffset = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    setState(() {
+      scrollOffset = _scrollController.offset;
+      print('Scroll Offset: $scrollOffset');
+      widget.visibilitysetter(scrollOffset);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -309,27 +365,27 @@ class MessageStream extends StatelessWidget {
             if (event
                     .data()['Event Name']
                     .toLowerCase()
-                    .contains(searchText.toLowerCase()) ||
+                    .contains(widget.searchText.toLowerCase()) ||
                 event
                     .data()['ID']
                     .toString()
                     .toLowerCase()
-                    .contains(searchText.toLowerCase()) ||
+                    .contains(widget.searchText.toLowerCase()) ||
                 event
                     .data()['Date']
                     .toLowerCase()
-                    .contains(searchText.toLowerCase()) ||
+                    .contains(widget.searchText.toLowerCase()) ||
                 event
                     .data()['Generated User']
                     .toLowerCase()
-                    .contains(searchText.toLowerCase())) {
-              if ((selectedStatus == 'ALL') ||
-                  (selectedStatus == event.data()['Status'])) {
-                if ((selectedUserType == 'ALL') ||
-                    ((selectedUserType == 'MY EVENTS') &&
+                    .contains(widget.searchText.toLowerCase())) {
+              if ((widget.selectedStatus == 'ALL') ||
+                  (widget.selectedStatus == event.data()['Status'])) {
+                if ((widget.selectedUserType == 'ALL') ||
+                    ((widget.selectedUserType == 'MY EVENTS') &&
                         (event.data()['Generated User'] ==
                             loggedInUser.email)) ||
-                    ((selectedUserType == 'OTHERS EVENTS') &&
+                    ((widget.selectedUserType == 'OTHERS EVENTS') &&
                         (event.data()['Generated User'] !=
                             loggedInUser.email))) {
                   bool flag = false;
@@ -356,9 +412,9 @@ class MessageStream extends StatelessWidget {
                         student: generatedUserName(
                             event.data()['User Type'],
                             event.data()['Generated User'],
-                            admins,
-                            faculties,
-                            students),
+                            widget.admins,
+                            widget.faculties,
+                            widget.students),
                         eventstatus: event.data()['Status'],
                         nextpage: Student_Faculty_event_details(
                           docId: event.id,
@@ -372,6 +428,7 @@ class MessageStream extends StatelessWidget {
           }
           return Expanded(
             child: ListView(
+              controller: _scrollController,
               padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10),
               children: EventRequests,
             ),
@@ -419,7 +476,7 @@ class EventCard extends StatelessWidget {
         ));
       },
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 13),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 1),
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(

@@ -63,7 +63,7 @@ class _VenuesState extends State<Venues> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                    margin: EdgeInsets.fromLTRB(20, 46, 0, 30),
                     child: _title(),
                   ),
                   widget.userType == 'ADMINISTRATOR'
@@ -94,7 +94,7 @@ class _VenuesState extends State<Venues> {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                 child: SizedBox(
                   height: 40,
                   child: TextFormField(
@@ -266,7 +266,7 @@ class VenueCard extends StatelessWidget {
                 height: 10,
               ),
               Text(
-                'Faculty ',
+                'Faculty in charge:',
                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
               ),
               SizedBox(

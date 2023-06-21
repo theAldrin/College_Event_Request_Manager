@@ -65,7 +65,7 @@ class _DepartmentState extends State<Department> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                    margin: EdgeInsets.fromLTRB(20, 46, 0, 30),
                     child: _title(),
                   ),
                   widget.userType == 'ADMINISTRATOR'
@@ -96,7 +96,7 @@ class _DepartmentState extends State<Department> {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                 child: SizedBox(
                   height: 40,
                   child: TextFormField(
