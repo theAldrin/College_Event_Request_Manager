@@ -45,6 +45,8 @@ dependencies:
   rolling_bottom_bar: ^0.2.2
   image_picker: ^0.8.9
   firebase_storage: ^11.2.3
+  flutter_phone_direct_caller: ^2.1.1
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:

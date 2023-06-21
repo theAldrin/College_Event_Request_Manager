@@ -3,6 +3,7 @@ import 'package:event_consent2/administrator_profile_edit.dart';
 import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class Administrator_profile extends StatefulWidget {
   Administrator_profile({required this.adminMail});
@@ -158,9 +159,14 @@ class _Administrator_profileState extends State<Administrator_profile> {
                 icon: Icons.school,
                 text: college,
               ),
-              ProfileDetailsCard(
-                icon: Icons.phone,
-                text: phoneno,
+              GestureDetector(
+                onTap: () async {
+                  await FlutterPhoneDirectCaller.callNumber(phoneno.toString());
+                },
+                child: ProfileDetailsCard(
+                  icon: Icons.phone,
+                  text: phoneno,
+                ),
               ),
               ProfileDetailsCard(
                 icon: Icons.email,

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/welcomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'student_profile_edit.dart';
 
 class Student_Profile extends StatefulWidget {
@@ -230,9 +231,14 @@ class _Student_ProfileState extends State<Student_Profile> {
                 icon: Icons.party_mode,
                 text: clubs,
               ),
-              ProfileDetailsCard(
-                icon: Icons.phone,
-                text: phoneno,
+              GestureDetector(
+                onTap: () async {
+                  await FlutterPhoneDirectCaller.callNumber(phoneno.toString());
+                },
+                child: ProfileDetailsCard(
+                  icon: Icons.phone,
+                  text: phoneno,
+                ),
               ),
               ProfileDetailsCard(
                 icon: Icons.email,

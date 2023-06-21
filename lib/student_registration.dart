@@ -333,7 +333,7 @@ class _Student_registrationState extends State<Student_registration> {
 
                             //Create a reference for the image to be stored
                             Reference referenceImageToUpload =
-                                referenceDirImages.child('name');
+                                referenceDirImages.child(uniqueFileName);
 
                             //Handle errors/success
                             try {
@@ -341,8 +341,11 @@ class _Student_registrationState extends State<Student_registration> {
                               await referenceImageToUpload
                                   .putFile(File(file!.path));
                               //Success: get the download URL
-                              imageUrl =
+                              String img =
                                   await referenceImageToUpload.getDownloadURL();
+                              setState(() {
+                                imageUrl = img;
+                              });
                             } catch (error) {
                               //Some error occurred
                             }
