@@ -39,7 +39,7 @@ class _Common_registerState extends State<Common_register> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: 'Event Consent App',
+        text: 'Event Hub',
         style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w700,

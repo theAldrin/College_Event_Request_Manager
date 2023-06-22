@@ -70,7 +70,7 @@ class _WelcomePageState extends State<WelcomePage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: 'Event Consent App',
+        text: 'Event Hub',
         style: GoogleFonts.portLligatSans(
           textStyle: Theme.of(context).textTheme.displayLarge,
           fontSize: 30,

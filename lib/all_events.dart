@@ -80,7 +80,7 @@ class _All_eventsState extends State<All_events> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.fromLTRB(15, 40, 0, 30),
+                margin: EdgeInsets.fromLTRB(22, 46, 0, 30),
                 child: _title(),
                 width: double.infinity,
               ),
@@ -90,7 +90,7 @@ class _All_eventsState extends State<All_events> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 30),
+                          vertical: 0, horizontal: 20),
                       child: SizedBox(
                         height: 40,
                         child: TextFormField(
@@ -119,124 +119,131 @@ class _All_eventsState extends State<All_events> {
                       ),
                     ),
                     SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
-                              child: Text(
-                                'STATUS',
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 0.9,
-                                ),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 0),
-                                child: DropdownButton<String>(
-                                  //isExpanded: true,
-                                  iconEnabledColor: Color(0xfff7892b),
-                                  iconSize: 25,
-                                  underline: SizedBox(),
-                                  value: _selectedStatus,
-                                  items: <String>[
-                                    'ALL',
-                                    'ONGOING',
-                                    'FINAL FACULTY ACCEPTED',
-                                    'ADMIN ACCEPTED',
-                                    'COMPLETED',
-                                    'REJECTED',
-                                    'WITHDRAWN'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    // Change function parameter to nullable string
-                                    setState(() {
-                                      _selectedStatus = newValue;
-                                    });
-                                  },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                                child: Text(
+                                  'STATUS',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
-                              child: Text(
-                                'USER',
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 0.9,
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 0.9,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 1),
-                                child: DropdownButton<String>(
-                                  //isExpanded: true,
-                                  iconEnabledColor: Color(0xfff7892b),
-                                  iconSize: 25,
-                                  underline: SizedBox(),
-                                  value: _selectedUserType,
-                                  items: <String>[
-                                    'ALL',
-                                    'MY EVENTS',
-                                    'OTHERS EVENTS',
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    // Change function parameter to nullable string
-                                    setState(() {
-                                      _selectedUserType = newValue;
-                                    });
-                                  },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 0),
+                                  child: DropdownButton<String>(
+                                    //isExpanded: true,
+                                    iconEnabledColor: Color(0xfff7892b),
+                                    iconSize: 25,
+                                    underline: SizedBox(),
+                                    value: _selectedStatus,
+                                    items: <String>[
+                                      'ALL',
+                                      'ONGOING',
+                                      'FINAL FACULTY ACCEPTED',
+                                      'ADMIN ACCEPTED',
+                                      'COMPLETED',
+                                      'REJECTED',
+                                      'WITHDRAWN'
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      // Change function parameter to nullable string
+                                      setState(() {
+                                        _selectedStatus = newValue;
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(6, 0, 0, 3.5),
+                                child: Text(
+                                  'USER',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 0.9,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 1),
+                                  child: DropdownButton<String>(
+                                    //isExpanded: true,
+                                    iconEnabledColor: Color(0xfff7892b),
+                                    iconSize: 25,
+                                    underline: SizedBox(),
+                                    value: _selectedUserType,
+                                    items: <String>[
+                                      'ALL',
+                                      'MY EVENTS',
+                                      'OTHERS EVENTS',
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      // Change function parameter to nullable string
+                                      setState(() {
+                                        _selectedUserType = newValue;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

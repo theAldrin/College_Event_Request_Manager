@@ -97,14 +97,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  custom_searchable_dropdown:
-    dependency: "direct main"
-    description:
-      name: custom_searchable_dropdown
-      sha256: c2676b1ee55f0b71a7cd890ae473cf97651f018b2695b3bf57c8c28a14e2fa95
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   dropdown_search:
     dependency: "direct main"
     description:
@@ -520,14 +512,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
-  searchfield:
-    dependency: "direct main"
-    description:
-      name: searchfield
-      sha256: b15f901e0a455c66fb9cb9b6f39a0c92860f2b5f411b6a37afa0215b36c05d70
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.3"
   sky_engine:
     dependency: transitive
     description: flutter

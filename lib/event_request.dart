@@ -1,11 +1,9 @@
-import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_bdaya/flutter_datetime_picker_bdaya.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:searchfield/searchfield.dart';
 
 class Event_request extends StatefulWidget {
   Event_request({required this.userType});

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_consent2/admininstrator_profile.dart';
 import 'package:event_consent2/student_profile.dart';
@@ -75,19 +77,6 @@ class _Student_Faculty_event_detailsState
     getDetails();
   }
 
-  Widget _title() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        text: name,
-        style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.w700,
-            color: Color(0xffe46b10)),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,10 +99,8 @@ class _Student_Faculty_event_detailsState
                         ))
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.fromLTRB(15, 10, 0, 30),
-                  child: _title(),
-                  width: double.infinity,
+                SizedBox(
+                  height: 20,
                 ),
                 Event_Detail_Column(
                   status: status,
@@ -133,6 +120,7 @@ class _Student_Faculty_event_detailsState
                   userType: userType,
                   reason: reason,
                   rejectedUser: rejectedUser,
+                  name: name,
                 )
               ]),
         ),
@@ -155,7 +143,8 @@ class Event_Detail_Column extends StatefulWidget {
       required this.status,
       required this.userType,
       required this.reason,
-      required this.rejectedUser});
+      required this.rejectedUser,
+      required this.name});
 
   final String id,
       date,
@@ -167,7 +156,8 @@ class Event_Detail_Column extends StatefulWidget {
       status,
       userType,
       reason,
-      rejectedUser;
+      rejectedUser,
+      name;
 
   final List<dynamic> faculties_involved;
   final bool isCompleted;
@@ -180,6 +170,18 @@ String docID = '';
 
 class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
   late String newReason;
+
+  Widget _title() {
+    return RichText(
+      text: TextSpan(
+        text: widget.name,
+        style: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.w700,
+            color: Color(0xffe46b10)),
+      ),
+    );
+  }
 
   Widget _RequestWithdrawButton(BuildContext context) {
     if ((widget.status == 'ONGOING' ||
@@ -303,10 +305,10 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
               gradient: LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
-                  colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+                  colors: [Colors.black87, Colors.black87])),
           child: Text(
             'WITHDRAW REQUEST',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            style: TextStyle(fontSize: 15, color: Colors.white),
           ),
         ),
       );
@@ -315,54 +317,66 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
     }
   }
 
+  Widget lastButton = Container();
   Widget bottompart(BuildContext context) {
     String currentOrFinal = '';
-    Widget lastButton;
+
     if (widget.status == 'ONGOING') {
-      currentOrFinal = 'Current Faculty :';
-      lastButton = _RequestWithdrawButton(context);
+      currentOrFinal = '-> Current Faculty';
+      setState(() {
+        lastButton = _RequestWithdrawButton(context);
+      });
     } else if (widget.status == 'FINAL FACULTY ACCEPTED' ||
         widget.status == 'ADMIN ACCEPTED') {
-      currentOrFinal = 'Final Accept By :';
-      lastButton = _RequestWithdrawButton(context);
+      currentOrFinal = ' -> Final Accept';
+      setState(() {
+        lastButton = _RequestWithdrawButton(context);
+      });
     } else {
-      lastButton = Text('');
+      lastButton = Container();
     }
 
     return Column(
       children: [
-        Text(
-          currentOrFinal,
-          textAlign: (currentOrFinal != '') ? TextAlign.center : null,
-          style: (currentOrFinal != '')
-              ? TextStyle(fontWeight: FontWeight.w900, fontSize: 30)
-              : null,
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Faculty_profile(
+                        facultyMail: widget.faculties_involved.last.toString(),
+                      ),
+                    ));
+              },
+              child: Text(
+                '  ' + widget.faculties_involved.last,
+                style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                    color: Colors.blueAccent),
+              ),
+            ),
+            Text(
+              currentOrFinal,
+              textAlign: (currentOrFinal != '') ? TextAlign.center : null,
+              style: (currentOrFinal != '')
+                  ? TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                      color: Colors.black54)
+                  : null,
+            ),
+          ],
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Faculty_profile(
-                    facultyMail: widget.faculties_involved.last.toString(),
-                  ),
-                ));
-          },
-          child: Text(
-            widget.faculties_involved.last,
-            style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 20,
-                color: Colors.blueAccent),
-          ),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        lastButton,
-        SizedBox(
-          height: 30,
-        )
+        // SizedBox(
+        //   height: 20,
+        // ),
+        // lastButton,
+        // SizedBox(
+        //   height: 30,
+        // )
       ],
     );
   }
@@ -386,7 +400,7 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
             faculty.toString(),
             style: TextStyle(
                 fontWeight: FontWeight.w800,
-                fontSize: 20,
+                fontSize: 15,
                 color: Colors.blueAccent),
           ),
         ));
@@ -397,182 +411,490 @@ class _Event_Detail_ColumnState extends State<Event_Detail_Column> {
 
   Widget reasonText() {
     if (widget.status == 'WITHDRAWN') {
-      return Text(
-        'REASON : ' + widget.reason,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+      return Column(
+        children: [
+          Text(
+            'REASON : ',
+            textAlign: TextAlign.left,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Text(
+            widget.reason,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 15,
+                color: Colors.black54),
+          ),
+        ],
       );
     } else if (widget.status == 'REJECTED') {
       return Column(
         children: [
           Text(
-            'REJECTED BY : ' + widget.rejectedUser,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+            'REJECTED BY  :  ' + widget.rejectedUser,
+            textAlign: TextAlign.left,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
           ),
           SizedBox(
             height: 10,
           ),
           Text(
             'REASON : ' + widget.reason,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 15,
+                color: Colors.black54),
           ),
         ],
       );
     } else {
-      return Text('');
+      return Container();
+    }
+  }
+
+  Color calStatusColour(String eventstatus) {
+    if (eventstatus == 'ADMIN ACCEPTED') {
+      return Colors.green;
+    } else if (eventstatus == 'ONGOING') {
+      return Colors.blue;
+    } else if (eventstatus == 'REJECTED' || eventstatus == 'WITHDRAWN') {
+      return Colors.red;
+    } else if (eventstatus == 'FINAL FACULTY ACCEPTED') {
+      return Colors.greenAccent;
+    } else {
+      return Colors.grey;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.fromLTRB(10, 10, 10, 45),
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Color(0xFFFAFAFA),
-        border: Border.all(
-          color: Colors.grey,
-          width: 0.4,
-        ),
-        boxShadow: [
-          BoxShadow(
-              color: Color(0x13000000),
-              blurRadius: 5,
-              spreadRadius: 1,
-              offset: Offset(0, 0)),
-        ],
-      ),
+      // decoration: BoxDecoration(
+      //   borderRadius: BorderRadius.circular(15),
+      //   color: Color(0xFFFAFAFA),
+      //   // border: Border.all(
+      //   //   color: Colors.grey,
+      //   //   width: 0.4,
+      //   // ),
+      //   boxShadow: [
+      //     BoxShadow(
+      //         color: Color(0x2f000000),
+      //         blurRadius: 5,
+      //         spreadRadius: 1,
+      //         offset: Offset(0, 0)),
+      //   ],
+      // ),
       margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
       child: Column(
         children: [
+          Container(
+            margin: EdgeInsets.fromLTRB(8, 0, 0, 30),
+            child: _title(),
+            width: double.infinity,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Color(0xFFFAFAFA),
+                      // border: Border.all(
+                      //   color: Colors.grey,
+                      //   width: 0.4,
+                      // ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color(0x2f000000),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                            offset: Offset(0, 0)),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'ID : ',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 17,
+                              ),
+                            ),
+                            Text(
+                              widget.id,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 17,
+                                  color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        Text(
+                          'APPLICANT : ',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 6,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            print(widget.userType);
+                            if (widget.userType == 'FACULTY') {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Faculty_profile(
+                                      facultyMail: widget.student,
+                                    ),
+                                  ));
+                            } else if (widget.userType == 'STUDENT') {
+                              print('student');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Student_Profile(
+                                      studentMail: widget.student,
+                                    ),
+                                  ));
+                            } else {
+                              print('admin');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          Administrator_profile(
+                                              adminMail: widget.student)));
+                            }
+                          },
+                          child: Text(
+                            widget.student,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                                color: Colors.blue),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 94,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Color(0xFFFAFAFA),
+                      // border: Border.all(
+                      //   color: Colors.grey,
+                      //   width: 0.4,
+                      // ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color(0x2f000000),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                            offset: Offset(0, 0)),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.date_range),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '   ' + widget.date,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.access_time_filled),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              '${widget.event_start_time} - ',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  color: Colors.black54),
+                            ),
+                            Text(
+                              widget.event_end_time,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           SizedBox(
-            height: 20,
+            height: 18,
           ),
-          Text(
-            'ID : ' + widget.id,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            'DATE : ' + widget.date,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            'GENERATED USER : ',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-          ),
-          TextButton(
-            onPressed: () {
-              print(widget.userType);
-              if (widget.userType == 'FACULTY') {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Faculty_profile(
-                        facultyMail: widget.student,
-                      ),
-                    ));
-              } else if (widget.userType == 'STUDENT') {
-                print('student');
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Student_Profile(
-                        studentMail: widget.student,
-                      ),
-                    ));
-              } else {
-                print('admin');
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            Administrator_profile(adminMail: widget.student)));
-              }
-            },
-            child: Text(
-              widget.student,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 20,
-                  color: Colors.blue),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Color(0xFFFAFAFA),
+                // border: Border.all(
+                //   color: Colors.grey,
+                //   width: 0.4,
+                // ),
+                boxShadow: [
+                  BoxShadow(
+                      color: Color(0x2f000000),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                      offset: Offset(0, 0)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                  ),
+                  Text(
+                    'DESCRIPTION',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                  ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    widget.description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: Colors.black54),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
-            height: 10,
+            height: 18,
           ),
-          Text(
-            'EVENT START TIME : ' + widget.event_start_time,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Color(0xFFFAFAFA),
+                      // border: Border.all(
+                      //   color: Colors.grey,
+                      //   width: 0.4,
+                      // ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color(0x2f000000),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                            offset: Offset(0, 0)),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'VENUE : ',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Text(
+                          widget.venue,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                              color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Color(0xFFFAFAFA),
+                      // border: Border.all(
+                      //   color: Colors.grey,
+                      //   width: 0.4,
+                      // ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color(0x2f000000),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                            offset: Offset(0, 0)),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'STATUS : ',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 7,
+                        ),
+                        Text(
+                          widget.status,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                              color: calStatusColour(widget.status)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(
-            height: 10,
+            height: 18,
           ),
-          Text(
-            'EVENT END TIME : ' + widget.event_end_time,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            'VENUE : ' + widget.venue,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Text(
-            'DESCRIPTION : ' + widget.description,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Text(
-            'STATUS : ' + widget.status,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Color(0xFFFAFAFA),
+                        // border: Border.all(
+                        //   color: Colors.grey,
+                        //   width: 0.4,
+                        // ),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color(0x2f000000),
+                              blurRadius: 5,
+                              spreadRadius: 1,
+                              offset: Offset(0, 0)),
+                        ],
+                      ),
+                      child: reasonText()),
+                ),
+              ),
+            ],
           ),
           SizedBox(
-            height: 30,
+            height: 18,
           ),
-          reasonText(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Color(0xFFFAFAFA),
+                // border: Border.all(
+                //   color: Colors.grey,
+                //   width: 0.4,
+                // ),
+                boxShadow: [
+                  BoxShadow(
+                      color: Color(0x2f000000),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                      offset: Offset(0, 0)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'FACULTIES INVOLVED',
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Column(
+                    children: facultylist(
+                        context), //returns text widgets of all the faculties involved except the last
+                  ),
+                  bottompart(context)
+                ],
+              ),
+            ),
+          ),
           SizedBox(
-            height: 30,
+            height: 18,
           ),
-          Text(
-            'FACULTIES INVOLVED:',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Column(
-            children: facultylist(
-                context), //returns text widgets of all the faculties involved except the last
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          bottompart(
-              context) //returns the last faculty current faculty/final accept giving faculty
+          lastButton //returns the last faculty current faculty/final accept giving faculty
         ],
       ),
     );
