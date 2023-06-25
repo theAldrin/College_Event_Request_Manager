@@ -8,7 +8,7 @@ Software Requirement Specification Document Link :- https://docs.google.com/docu
 
 The app has 3 types of users and they have the following functions:
 
-1>STUDENTS -Register -Login -Create New Event Request -View Status of All Event Requests -View Event Calendar -View Hall Allotment Details
+1>STUDENTS -Register -Login -Create New Event Request -View Status of All Event Requests -View Event Calendar
 
 2>FACULTIES -Register -Login -View Pending Requests -Accept/Reject Pending Requests -Forward Pending Requests -Create New Event Request -View Status of All Event Requests -View Event Calendar -View Hall Allotment Details
 
