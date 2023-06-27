@@ -14,4 +14,3 @@ The app has 3 types of users and they have the following functions:
 
 3>ADMINISTRATOR -Register -Login -Faculty Authorization -Hall Allotment Control -View and Edit Event Calendar -View all Event Requests and their status
 
-NO BUILD FILE
