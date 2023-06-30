@@ -1,3 +1,5 @@
+##Event Hub
+
 An App for Managing the entire process of acquiring consent for an event that is to be conducted in a college Environment.
 
 
