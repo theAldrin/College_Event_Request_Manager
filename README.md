@@ -1,6 +1,7 @@
 # Event Hub
 
 An App for Managing the entire process of acquiring consent for an event that is to be conducted in a college Environment.
+NB: Login with a mail(even if not existing) with '@tkmce.ac.in' at the end
 
 
 
