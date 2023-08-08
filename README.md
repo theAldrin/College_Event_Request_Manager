@@ -5,10 +5,6 @@ NB: Login with a mail(even if not existing) with '@tkmce.ac.in' at the end
 
 
 
-https://github.com/theAldrin/College_Event_Request_Manager/assets/81380714/e8710958-e26d-4736-8467-df9eb6ad67be
-
-
-
 
 https://github.com/theAldrin/College_Event_Request_Manager/assets/81380714/09894642-340b-4821-8b82-c63e8e48329d
 
@@ -28,6 +24,11 @@ https://github.com/theAldrin/College_Event_Request_Manager/assets/81380714/93996
 
 
 https://github.com/theAldrin/College_Event_Request_Manager/assets/81380714/5000195e-4e85-48b5-accd-4622289f4405
+
+
+
+
+https://github.com/theAldrin/College_Event_Request_Manager/assets/81380714/e8710958-e26d-4736-8467-df9eb6ad67be
 
 
 Figma Link :- https://www.figma.com/file/CVG9SyWymsjST2zEsZz84u/VERSION1?node-id=0%3A1&t=2VPw9r8xzTRObk1G-1
